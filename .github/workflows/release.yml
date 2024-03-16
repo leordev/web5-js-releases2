@@ -84,8 +84,9 @@ jobs:
 
   publish-docs:
     permissions:
-      pages: write # to publish to GitHub Pages
-      id-token: write # necessary for GH Pages
+      contents: write
+      pages: write
+      id-token: write
 
     needs: release
     name: Publish Docs
