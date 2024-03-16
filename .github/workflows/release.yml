@@ -83,6 +83,10 @@ jobs:
           pnpm changeset publish --no-git-tag --tag next
 
   publish-docs:
+    permissions:
+      pages: write # to publish to GitHub Pages
+      id-token: write # necessary for GH Pages
+
     needs: release
     name: Publish Docs
     if: ${{ needs.release.outputs.published == 'true' }}
