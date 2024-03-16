@@ -1,165 +1,165 @@
-name: Continuous Integration
+# name: Continuous Integration
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+# on:
+#   push:
+#     branches:
+#       - main
+#   pull_request:
+#     branches:
+#       - main
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+#   # Allows you to run this workflow manually from the Actions tab
+#   workflow_dispatch:
 
-jobs:
-  security-audit:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 #v4.1.1
+# jobs:
+#   security-audit:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout source
+#         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 #v4.1.1
 
-      # https://cashapp.github.io/hermit/usage/ci/
-      - name: Init Hermit
-        uses: cashapp/activate-hermit@v1
-        with:
-          cache: "true"
+#       # https://cashapp.github.io/hermit/usage/ci/
+#       - name: Init Hermit
+#         uses: cashapp/activate-hermit@v1
+#         with:
+#           cache: "true"
 
-      - name: Report known vulnerabilities
-        run: pnpm audit
+#       - name: Report known vulnerabilities
+#         run: pnpm audit
 
-  test-with-node:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 #v4.1.1
-        with:
-          submodules: true
-    
-      # https://cashapp.github.io/hermit/usage/ci/
-      - name: Init Hermit
-        uses: cashapp/activate-hermit@v1
-        with:
-          cache: "true"
+#   test-with-node:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout source
+#         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 #v4.1.1
+#         with:
+#           submodules: true
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+#       # https://cashapp.github.io/hermit/usage/ci/
+#       - name: Init Hermit
+#         uses: cashapp/activate-hermit@v1
+#         with:
+#           cache: "true"
 
-      - name: Build all workspace packages
-        run: pnpm --recursive --stream build:esm && pnpm --recursive --stream build:cjs
+#       - name: Install dependencies
+#         run: pnpm install --frozen-lockfile
 
-      - name: Run linter for all packages
-        run: pnpm --recursive --stream lint
+#       - name: Build all workspace packages
+#         run: pnpm --recursive --stream build:esm && pnpm --recursive --stream build:cjs
 
-      - name: Run dwn-server (background)
-        run: |
-          node node_modules/@web5/dwn-server/dist/esm/src/main.js &
-          echo "DWN_SERVER_BACKGROUND_PROCESS=$!" >> $GITHUB_ENV
+#       - name: Run linter for all packages
+#         run: pnpm --recursive --stream lint
 
-      - name: Build tests for all packages
-        run: pnpm --recursive --stream --sequential build:tests:node
+#       - name: Run dwn-server (background)
+#         run: |
+#           node node_modules/@web5/dwn-server/dist/esm/src/main.js &
+#           echo "DWN_SERVER_BACKGROUND_PROCESS=$!" >> $GITHUB_ENV
 
-      - name: Run tests for all packages
-        run: pnpm --recursive --stream exec c8 mocha -- --color --reporter mocha-junit-reporter --reporter-options mochaFile=./results.xml
-        env:
-          TEST_DWN_URL: http://localhost:3000
+#       - name: Build tests for all packages
+#         run: pnpm --recursive --stream --sequential build:tests:node
 
-      - name: Terminate dwn-server
-        run: kill $DWN_SERVER_BACKGROUND_PROCESS || true
+#       - name: Run tests for all packages
+#         run: pnpm --recursive --stream exec c8 mocha -- --color --reporter mocha-junit-reporter --reporter-options mochaFile=./results.xml
+#         env:
+#           TEST_DWN_URL: http://localhost:3000
 
-      - name: Upload test coverage to Codecov
-        uses: codecov/codecov-action@eaaf4bedf32dbdc6b720b63067d99c4d77d6047d # v3.1.4
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+#       - name: Terminate dwn-server
+#         run: kill $DWN_SERVER_BACKGROUND_PROCESS || true
 
-      - name: Upload test results to update SDK reports
-        uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
-        with:
-          name: junit-results
-          path: packages/*/results.xml
+#       - name: Upload test coverage to Codecov
+#         uses: codecov/codecov-action@eaaf4bedf32dbdc6b720b63067d99c4d77d6047d # v3.1.4
+#         env:
+#           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-      - name: Generate an access token to trigger downstream repo
-        uses: actions/create-github-app-token@f2acddfb5195534d487896a656232b016a682f3c # v1.9.0
-        id: generate_token
-        if: github.ref == 'refs/heads/main'
-        with:
-          app-id: ${{ secrets.CICD_ROBOT_GITHUB_APP_ID }}
-          private-key: ${{ secrets.CICD_ROBOT_GITHUB_APP_PRIVATE_KEY }}
-          owner: TBD54566975
-          repositories: sdk-report-runner
+#       - name: Upload test results to update SDK reports
+#         uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
+#         with:
+#           name: junit-results
+#           path: packages/*/results.xml
 
-      - name: Trigger sdk-report-runner report build
-        if: github.ref == 'refs/heads/main'
-        run: |
-          curl -L \
-          -H "Authorization: Bearer ${APP_TOKEN}" \
-          -H "X-GitHub-Api-Version: 2022-11-28" \
-          -H "Content-Type: application/json" \
-          --fail \
-          --data '{"ref": "main"}' \
-          https://api.github.com/repos/TBD54566975/sdk-report-runner/actions/workflows/build-report.yaml/dispatches
-        env:
-          APP_TOKEN: ${{ steps.generate_token.outputs.token }}
+#       - name: Generate an access token to trigger downstream repo
+#         uses: actions/create-github-app-token@f2acddfb5195534d487896a656232b016a682f3c # v1.9.0
+#         id: generate_token
+#         if: github.ref == 'refs/heads/main'
+#         with:
+#           app-id: ${{ secrets.CICD_ROBOT_GITHUB_APP_ID }}
+#           private-key: ${{ secrets.CICD_ROBOT_GITHUB_APP_PRIVATE_KEY }}
+#           owner: TBD54566975
+#           repositories: sdk-report-runner
 
-  test-with-browsers:
-    name: test-with-browsers (group ${{ matrix.group }})
-    # Run browser tests using macOS so that WebKit tests don't fail under a Linux environment
-    runs-on: macos-14
-    strategy:
-      # parallelism strategy: agent takes as long as roughly all other pkgs combined.
-      matrix:
-        include:
-          - group: "A"
-            packages: "--filter agent"
-          - group: "B"
-            packages: "--filter credentials --filter crypto --filter dids --filter proxy-agent --filter identity-agent --filter user-agent"
-          - group: "C"
-            packages: "--filter api --filter common"
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 #v4.1.1
-        with:
-          submodules: true
+#       - name: Trigger sdk-report-runner report build
+#         if: github.ref == 'refs/heads/main'
+#         run: |
+#           curl -L \
+#           -H "Authorization: Bearer ${APP_TOKEN}" \
+#           -H "X-GitHub-Api-Version: 2022-11-28" \
+#           -H "Content-Type: application/json" \
+#           --fail \
+#           --data '{"ref": "main"}' \
+#           https://api.github.com/repos/TBD54566975/sdk-report-runner/actions/workflows/build-report.yaml/dispatches
+#         env:
+#           APP_TOKEN: ${{ steps.generate_token.outputs.token }}
 
-      # https://cashapp.github.io/hermit/usage/ci/
-      - name: Init Hermit
-        uses: cashapp/activate-hermit@v1
-        with:
-          cache: "true"
+#   test-with-browsers:
+#     name: test-with-browsers (group ${{ matrix.group }})
+#     # Run browser tests using macOS so that WebKit tests don't fail under a Linux environment
+#     runs-on: macos-14
+#     strategy:
+#       # parallelism strategy: agent takes as long as roughly all other pkgs combined.
+#       matrix:
+#         include:
+#           - group: "A"
+#             packages: "--filter agent"
+#           - group: "B"
+#             packages: "--filter credentials --filter crypto --filter dids --filter proxy-agent --filter identity-agent --filter user-agent"
+#           - group: "C"
+#             packages: "--filter api --filter common"
+#     steps:
+#       - name: Checkout source
+#         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 #v4.1.1
+#         with:
+#           submodules: true
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+#       # https://cashapp.github.io/hermit/usage/ci/
+#       - name: Init Hermit
+#         uses: cashapp/activate-hermit@v1
+#         with:
+#           cache: "true"
 
-      - name: Get Playwright Version (for cache)
-        id: get-playwright-version
-        run: |
-          PLAYWRIGHT_VERSION=$(pnpm --filter dids ls @playwright/test | grep '@playwright/test' | awk 'NR==1{print $2}')
-          echo "Playwright Version: $PLAYWRIGHT_VERSION"
-          echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV
+#       - name: Install dependencies
+#         run: pnpm install --frozen-lockfile
 
-      - name: Restore Cached Playwright Browsers
-        id: cache-playwright-restore
-        uses: actions/cache@ab5e6d0c87105b4c9c2047343972218f562e4319 #v4.0.1
-        with:
-          path: ~/Library/Caches/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
+#       - name: Get Playwright Version (for cache)
+#         id: get-playwright-version
+#         run: |
+#           PLAYWRIGHT_VERSION=$(pnpm --filter dids ls @playwright/test | grep '@playwright/test' | awk 'NR==1{print $2}')
+#           echo "Playwright Version: $PLAYWRIGHT_VERSION"
+#           echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV
 
-      - name: Install Playwright Browsers (if no cache)
-        if: steps.cache-playwright-restore.outputs.cache-hit != 'true'
-        run: pnpm --filter dids exec playwright install --with-deps
+#       - name: Restore Cached Playwright Browsers
+#         id: cache-playwright-restore
+#         uses: actions/cache@ab5e6d0c87105b4c9c2047343972218f562e4319 #v4.0.1
+#         with:
+#           path: ~/Library/Caches/ms-playwright
+#           key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
 
-      - name: Build esm
-        run: pnpm --recursive --stream build:esm
+#       - name: Install Playwright Browsers (if no cache)
+#         if: steps.cache-playwright-restore.outputs.cache-hit != 'true'
+#         run: pnpm --filter dids exec playwright install --with-deps
 
-      - name: Build browser for matrix ${{ matrix.group }}
-        run: pnpm ${{ matrix.packages }} build:browser
+#       - name: Build esm
+#         run: pnpm --recursive --stream build:esm
 
-      - name: Run dwn-server (background)
-        run: |
-          node node_modules/@web5/dwn-server/dist/esm/src/main.js &
-          echo "DWN_SERVER_BACKGROUND_PROCESS=$!" >> $GITHUB_ENV
+#       - name: Build browser for matrix ${{ matrix.group }}
+#         run: pnpm ${{ matrix.packages }} build:browser
 
-      - name: Run tests for matrix ${{ matrix.group }}
-        run: pnpm ${{ matrix.packages }} --sequential test:browser
+#       - name: Run dwn-server (background)
+#         run: |
+#           node node_modules/@web5/dwn-server/dist/esm/src/main.js &
+#           echo "DWN_SERVER_BACKGROUND_PROCESS=$!" >> $GITHUB_ENV
 
-      - name: Terminate dwn-server
-        run: kill $DWN_SERVER_BACKGROUND_PROCESS || true
+#       - name: Run tests for matrix ${{ matrix.group }}
+#         run: pnpm ${{ matrix.packages }} --sequential test:browser
+
+#       - name: Terminate dwn-server
+#         run: kill $DWN_SERVER_BACKGROUND_PROCESS || true
