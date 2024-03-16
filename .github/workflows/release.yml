@@ -48,6 +48,8 @@ jobs:
         run: pnpm whoami
 
       - name: Install dependencies
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: pnpm ci
 
       - name: Build all workspace packages
