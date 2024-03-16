@@ -1,5 +1,5 @@
 {
-  "name": "@web5/crypto-aws-kms",
+  "name": "@leordev-web5/crypto-aws-kms",
   "version": "0.2.0",
   "description": "Web5 cryptographic library using AWS KMS",
   "type": "module",
@@ -70,7 +70,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-kms": "3.478.0",
-    "@web5/crypto": "0.4.0"
+    "@leordev-web5/crypto": "0.4.0"
   },
   "devDependencies": {
     "@playwright/test": "1.40.1",
@@ -84,7 +84,7 @@
     "@typescript-eslint/parser": "6.4.0",
     "@web/test-runner": "0.18.0",
     "@web/test-runner-playwright": "0.11.0",
-    "@web5/common": "0.2.3",
+    "@leordev-web5/common": "0.2.3",
     "c8": "9.0.0",
     "chai": "4.3.10",
     "chai-as-promised": "7.1.1",

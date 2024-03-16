@@ -1,5 +1,5 @@
 {
-  "name": "@web5/agent",
+  "name": "@leordev-web5/agent",
   "version": "0.2.6",
   "type": "module",
   "main": "./dist/cjs/index.js",
@@ -70,9 +70,9 @@
   "dependencies": {
     "@noble/hashes": "1.3.3",
     "@tbd54566975/dwn-sdk-js": "0.2.10",
-    "@web5/common": "0.2.3",
-    "@web5/crypto": "0.2.2",
-    "@web5/dids": "0.2.4",
+    "@leordev-web5/common": "0.2.3",
+    "@leordev-web5/crypto": "0.2.2",
+    "@leordev-web5/dids": "0.2.4",
     "level": "8.0.0",
     "readable-stream": "4.4.2",
     "readable-web-to-node-stream": "3.0.2",

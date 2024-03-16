@@ -1,5 +1,5 @@
 {
-  "name": "@web5/proxy-agent",
+  "name": "@leordev-web5/proxy-agent",
   "version": "0.2.6",
   "type": "module",
   "main": "./dist/cjs/index.js",
@@ -68,10 +68,10 @@
     "node": ">=20.9.0"
   },
   "dependencies": {
-    "@web5/agent": "0.2.6",
-    "@web5/common": "0.2.3",
-    "@web5/crypto": "0.2.2",
-    "@web5/dids": "0.2.4"
+    "@leordev-web5/agent": "0.2.6",
+    "@leordev-web5/common": "0.2.3",
+    "@leordev-web5/crypto": "0.2.2",
+    "@leordev-web5/dids": "0.2.4"
   },
   "devDependencies": {
     "@playwright/test": "1.40.1",
