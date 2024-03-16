@@ -1,5 +1,5 @@
 {
-  "name": "@leordev-web5/agent",
+  "name": "@web5/agent",
   "version": "0.2.6",
   "type": "module",
   "main": "./dist/cjs/index.js",

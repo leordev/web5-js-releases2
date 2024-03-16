@@ -1,5 +1,5 @@
 {
-  "name": "@leordev-web5/dids",
+  "name": "@web5/dids",
   "version": "0.4.1",
   "description": "TBD DIDs library",
   "type": "module",

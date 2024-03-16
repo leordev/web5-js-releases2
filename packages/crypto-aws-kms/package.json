@@ -1,5 +1,5 @@
 {
-  "name": "@leordev-web5/crypto-aws-kms",
+  "name": "@web5/crypto-aws-kms",
   "version": "0.2.0",
   "description": "Web5 cryptographic library using AWS KMS",
   "type": "module",

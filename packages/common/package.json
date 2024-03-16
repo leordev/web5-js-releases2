@@ -1,5 +1,5 @@
 {
-  "name": "@leordev-web5/common",
+  "name": "@web5/common",
   "version": "0.2.4",
   "type": "module",
   "main": "./dist/cjs/index.js",
