@@ -4,7 +4,7 @@
 function publish {
     echo "Publishing $1..."
     cd packages/$1
-    pnpm publish $1 --dry-run 
+    pnpm publish --dry-run --no-git-checks
     cd ../..
 }
 
