@@ -48,12 +48,10 @@ jobs:
         run: pnpm whoami
 
       - name: Install dependencies
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: pnpm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Build all workspace packages
-        run: pnpm build
+        run: pnpm --recursive --stream build:esm && pnpm --recursive --stream build:cjs
 
       - name: Create Release Pull Request or Publish to npm
         uses: changesets/action@f13b1baaa620fde937751f5d2c3572b9da32af23 # v1.4.5
