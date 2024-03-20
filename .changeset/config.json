@@ -3,7 +3,7 @@
   "changelog": [
     "@changesets/changelog-github",
     {
-      "repo": "TBD54566975/web5-js"
+      "repo": "leordev/web5-js-releases2"
     }
   ],
   "commit": false,

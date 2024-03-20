@@ -18,11 +18,11 @@
     "test:node": "pnpm build:tests:node && pnpm c8 mocha",
     "test:browser": "pnpm build:tests:browser && web-test-runner"
   },
-  "homepage": "https://github.com/TBD54566975/web5-js/tree/main/packages/identity-agent#readme",
-  "bugs": "https://github.com/TBD54566975/web5-js/issues",
+  "homepage": "https://github.com/leordev/web5-js-releases2/tree/main/packages/identity-agent#readme",
+  "bugs": "https://github.com/leordev/web5-js-releases2/issues",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/TBD54566975/web5-js.git",
+    "url": "git+https://github.com/leordev/web5-js-releases2.git",
     "directory": "packages/identity-agent"
   },
   "license": "Apache-2.0",
@@ -62,7 +62,8 @@
     "web5"
   ],
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "provenance": true
   },
   "engines": {
     "node": ">=20.9.0"
