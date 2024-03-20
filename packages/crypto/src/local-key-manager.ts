@@ -1,13 +1,20 @@
-import { KeyValueStore, MemoryStore } from '@web5/common';
+import { KeyValueStore, MemoryStore } from "@leordev-web5/common";
 
-import type { Jwk } from './jose/jwk.js';
-import type { Hasher } from './types/hasher.js';
-import type { Signer } from './types/signer.js';
-import type { CryptoApi } from './types/crypto-api.js';
-import type { KeyIdentifier } from './types/identifier.js';
-import type { KeyImporterExporter } from './types/key-io.js';
-import type { KeyGenerator, AsymmetricKeyGenerator } from './types/key-generator.js';
-import type { GetPublicKeyParams, SignParams, VerifyParams } from './types/params-direct.js';
+import type { Jwk } from "./jose/jwk.js";
+import type { Hasher } from "./types/hasher.js";
+import type { Signer } from "./types/signer.js";
+import type { CryptoApi } from "./types/crypto-api.js";
+import type { KeyIdentifier } from "./types/identifier.js";
+import type { KeyImporterExporter } from "./types/key-io.js";
+import type {
+  KeyGenerator,
+  AsymmetricKeyGenerator,
+} from "./types/key-generator.js";
+import type {
+  GetPublicKeyParams,
+  SignParams,
+  VerifyParams,
+} from "./types/params-direct.js";
 import type {
   KmsSignParams,
   KmsDigestParams,
@@ -17,13 +24,17 @@ import type {
   KmsImportKeyParams,
   KmsGenerateKeyParams,
   KmsGetPublicKeyParams,
-} from './types/params-kms.js';
+} from "./types/params-kms.js";
 
-import { Sha2Algorithm } from './algorithms/sha-2.js';
-import { EcdsaAlgorithm } from './algorithms/ecdsa.js';
-import { EdDsaAlgorithm } from './algorithms/eddsa.js';
-import { CryptoAlgorithm } from './algorithms/crypto-algorithm.js';
-import { computeJwkThumbprint, isPrivateJwk, KEY_URI_PREFIX_JWK } from './jose/jwk.js';
+import { Sha2Algorithm } from "./algorithms/sha-2.js";
+import { EcdsaAlgorithm } from "./algorithms/ecdsa.js";
+import { EdDsaAlgorithm } from "./algorithms/eddsa.js";
+import { CryptoAlgorithm } from "./algorithms/crypto-algorithm.js";
+import {
+  computeJwkThumbprint,
+  isPrivateJwk,
+  KEY_URI_PREFIX_JWK,
+} from "./jose/jwk.js";
 
 /**
  * `supportedAlgorithms` is an object mapping algorithm names to their respective implementations
@@ -34,34 +45,35 @@ import { computeJwkThumbprint, isPrivateJwk, KEY_URI_PREFIX_JWK } from './jose/j
  * `LocalKeyManager` class.
  */
 const supportedAlgorithms = {
-  'Ed25519': {
-    implementation : EdDsaAlgorithm,
-    names          : ['Ed25519'],
+  Ed25519: {
+    implementation: EdDsaAlgorithm,
+    names: ["Ed25519"],
   },
-  'secp256k1': {
-    implementation : EcdsaAlgorithm,
-    names          : ['ES256K', 'secp256k1'],
+  secp256k1: {
+    implementation: EcdsaAlgorithm,
+    names: ["ES256K", "secp256k1"],
   },
-  'secp256r1': {
-    implementation : EcdsaAlgorithm,
-    names          : ['ES256', 'secp256r1'],
+  secp256r1: {
+    implementation: EcdsaAlgorithm,
+    names: ["ES256", "secp256r1"],
   },
-  'SHA-256': {
-    implementation : Sha2Algorithm,
-    names          : ['SHA-256']
-  }
+  "SHA-256": {
+    implementation: Sha2Algorithm,
+    names: ["SHA-256"],
+  },
 } satisfies {
   [key: string]: {
-    implementation : typeof CryptoAlgorithm;
-    names          : string[];
-  }
+    implementation: typeof CryptoAlgorithm;
+    names: string[];
+  };
 };
 
 /* Helper type for `supportedAlgorithms`. */
 type SupportedAlgorithm = keyof typeof supportedAlgorithms;
 
 /* Helper type for `supportedAlgorithms` implementations. */
-type AlgorithmConstructor = typeof supportedAlgorithms[SupportedAlgorithm]['implementation'];
+type AlgorithmConstructor =
+  (typeof supportedAlgorithms)[SupportedAlgorithm]["implementation"];
 
 /**
  * The `LocalKeyManagerParams` interface specifies the parameters for initializing an instance of
@@ -89,7 +101,7 @@ export interface LocalKeyManagerDigestParams extends KmsDigestParams {
    * A string defining the name of hash function to use. The value must be one of the following:
    * - `"SHA-256"`: Generates a 256-bit digest.
    */
-  algorithm: 'SHA-256';
+  algorithm: "SHA-256";
 }
 
 /**
@@ -103,20 +115,24 @@ export interface LocalKeyManagerGenerateKeyParams extends KmsGenerateKeyParams {
    * - `"Ed25519"`
    * - `"secp256k1"`
    */
-  algorithm: 'Ed25519' | 'secp256k1' | 'secp256r1';
+  algorithm: "Ed25519" | "secp256k1" | "secp256r1";
 }
 
-export class LocalKeyManager implements
+export class LocalKeyManager
+  implements
     CryptoApi,
-    KeyImporterExporter<KmsImportKeyParams, KeyIdentifier, KmsExportKeyParams> {
-
+    KeyImporterExporter<KmsImportKeyParams, KeyIdentifier, KmsExportKeyParams>
+{
   /**
    * A private map that stores instances of cryptographic algorithm implementations. Each key in
    * this map is an `AlgorithmConstructor`, and its corresponding value is an instance of a class
    * that implements a specific cryptographic algorithm. This map is used to cache and reuse
    * instances for performance optimization, ensuring that each algorithm is instantiated only once.
    */
-  private _algorithmInstances: Map<AlgorithmConstructor, InstanceType<typeof CryptoAlgorithm>> = new Map();
+  private _algorithmInstances: Map<
+    AlgorithmConstructor,
+    InstanceType<typeof CryptoAlgorithm>
+  > = new Map();
 
   /**
    * The `_keyStore` private variable in `LocalKeyManager` is a `KeyValueStore` instance used for
@@ -157,9 +173,10 @@ export class LocalKeyManager implements
    *
    * @returns A Promise which will be fulfilled with the hash digest.
    */
-  public async digest({ algorithm, data }:
-    LocalKeyManagerDigestParams
-  ): Promise<Uint8Array> {
+  public async digest({
+    algorithm,
+    data,
+  }: LocalKeyManagerDigestParams): Promise<Uint8Array> {
     // Get the hash function implementation based on the specified `algorithm` parameter.
     const hasher = this.getAlgorithm({ algorithm }) as Hasher<KmsDigestParams>;
 
@@ -188,9 +205,7 @@ export class LocalKeyManager implements
    *
    * @returns A Promise resolving to the JWK representation of the exported key.
    */
-  public async exportKey({ keyUri }:
-    KmsExportKeyParams
-  ): Promise<Jwk> {
+  public async exportKey({ keyUri }: KmsExportKeyParams): Promise<Jwk> {
     // Get the private key from the key store.
     const privateKey = await this.getPrivateKey({ keyUri });
 
@@ -213,17 +228,20 @@ export class LocalKeyManager implements
    *
    * @returns A Promise that resolves to the key URI, a unique identifier for the generated key.
    */
-  public async generateKey({ algorithm }:
-    LocalKeyManagerGenerateKeyParams
-  ): Promise<KeyIdentifier> {
+  public async generateKey({
+    algorithm,
+  }: LocalKeyManagerGenerateKeyParams): Promise<KeyIdentifier> {
     // Get the key generator implementation based on the specified `algorithm` parameter.
-    const keyGenerator = this.getAlgorithm({ algorithm }) as KeyGenerator<LocalKeyManagerGenerateKeyParams, Jwk>;
+    const keyGenerator = this.getAlgorithm({ algorithm }) as KeyGenerator<
+      LocalKeyManagerGenerateKeyParams,
+      Jwk
+    >;
 
     // Generate the key.
     const key = await keyGenerator.generateKey({ algorithm });
 
     if (key?.kid === undefined) {
-      throw new Error('Generated key is missing a required property: kid');
+      throw new Error("Generated key is missing a required property: kid");
     }
 
     // Construct the key URI.
@@ -262,9 +280,7 @@ export class LocalKeyManager implements
    *
    * @returns A Promise that resolves to the key URI as a string.
    */
-  public async getKeyUri({ key }:
-    KmsGetKeyUriParams
-  ): Promise<KeyIdentifier> {
+  public async getKeyUri({ key }: KmsGetKeyUriParams): Promise<KeyIdentifier> {
     // Compute the JWK thumbprint.
     const jwkThumbprint = await computeJwkThumbprint({ jwk: key });
 
@@ -290,9 +306,7 @@ export class LocalKeyManager implements
    *
    * @returns A Promise that resolves to the public key in JWK format.
    */
-  public async getPublicKey({ keyUri }:
-    KmsGetPublicKeyParams
-  ): Promise<Jwk> {
+  public async getPublicKey({ keyUri }: KmsGetPublicKeyParams): Promise<Jwk> {
     // Get the private key from the key store.
     const privateKey = await this.getPrivateKey({ keyUri });
 
@@ -300,7 +314,13 @@ export class LocalKeyManager implements
     const algorithm = this.getAlgorithmName({ key: privateKey });
 
     // Get the key generator based on the algorithm name.
-    const keyGenerator = this.getAlgorithm({ algorithm }) as AsymmetricKeyGenerator<LocalKeyManagerGenerateKeyParams, Jwk, GetPublicKeyParams>;
+    const keyGenerator = this.getAlgorithm({
+      algorithm,
+    }) as AsymmetricKeyGenerator<
+      LocalKeyManagerGenerateKeyParams,
+      Jwk,
+      GetPublicKeyParams
+    >;
 
     // Get the public key properties from the private JWK.
     const publicKey = await keyGenerator.getPublicKey({ key: privateKey });
@@ -332,10 +352,11 @@ export class LocalKeyManager implements
    *
    * @returns A Promise resolving to the key URI, uniquely identifying the imported key.
    */
-  public async importKey({ key }:
-    KmsImportKeyParams
-  ): Promise<KeyIdentifier> {
-    if (!isPrivateJwk(key)) throw new TypeError('Invalid key provided. Must be a private key in JWK format.');
+  public async importKey({ key }: KmsImportKeyParams): Promise<KeyIdentifier> {
+    if (!isPrivateJwk(key))
+      throw new TypeError(
+        "Invalid key provided. Must be a private key in JWK format."
+      );
 
     // Make a deep copy of the key to avoid mutating the original.
     const privateKey = structuredClone(key);
@@ -375,9 +396,7 @@ export class LocalKeyManager implements
    *
    * @returns A Promise resolving to the digital signature as a `Uint8Array`.
    */
-  public async sign({ keyUri, data }:
-    KmsSignParams
-  ): Promise<Uint8Array> {
+  public async sign({ keyUri, data }: KmsSignParams): Promise<Uint8Array> {
     // Get the private key from the key store.
     const privateKey = await this.getPrivateKey({ keyUri });
 
@@ -385,7 +404,10 @@ export class LocalKeyManager implements
     const algorithm = this.getAlgorithmName({ key: privateKey });
 
     // Get the signature algorithm based on the algorithm name.
-    const signer = this.getAlgorithm({ algorithm }) as Signer<SignParams, VerifyParams>;
+    const signer = this.getAlgorithm({ algorithm }) as Signer<
+      SignParams,
+      VerifyParams
+    >;
 
     // Sign the data.
     const signature = signer.sign({ data, key: privateKey });
@@ -418,14 +440,19 @@ export class LocalKeyManager implements
    *
    * @returns A Promise resolving to a boolean indicating whether the signature is valid.
    */
-  public async verify({ key, signature, data }:
-    KmsVerifyParams
-  ): Promise<boolean> {
+  public async verify({
+    key,
+    signature,
+    data,
+  }: KmsVerifyParams): Promise<boolean> {
     // Determine the algorithm name based on the JWK's `alg` and `crv` properties.
     const algorithm = this.getAlgorithmName({ key });
 
     // Get the signature algorithm based on the algorithm name.
-    const signer = this.getAlgorithm({ algorithm }) as Signer<SignParams, VerifyParams>;
+    const signer = this.getAlgorithm({ algorithm }) as Signer<
+      SignParams,
+      VerifyParams
+    >;
 
     // Verify the signature.
     const isSignatureValid = signer.verify({ key, signature, data });
@@ -453,19 +480,25 @@ export class LocalKeyManager implements
    *
    * @throws Error if the requested algorithm is not supported.
    */
-  private getAlgorithm({ algorithm }: {
+  private getAlgorithm({
+    algorithm,
+  }: {
     algorithm: SupportedAlgorithm;
   }): InstanceType<typeof CryptoAlgorithm> {
     // Check if algorithm is supported.
-    const AlgorithmImplementation = supportedAlgorithms[algorithm]?.['implementation'];
+    const AlgorithmImplementation =
+      supportedAlgorithms[algorithm]?.["implementation"];
     if (!AlgorithmImplementation) {
       throw new Error(`Algorithm not supported: ${algorithm}`);
     }
 
     // Check if instance already exists for the `AlgorithmImplementation`.
     if (!this._algorithmInstances.has(AlgorithmImplementation)) {
-    // If not, create a new instance and store it in the cache
-      this._algorithmInstances.set(AlgorithmImplementation, new AlgorithmImplementation());
+      // If not, create a new instance and store it in the cache
+      this._algorithmInstances.set(
+        AlgorithmImplementation,
+        new AlgorithmImplementation()
+      );
     }
 
     // Return the cached instance
@@ -492,8 +525,10 @@ export class LocalKeyManager implements
    *
    * @throws Error if the algorithm cannot be determined from the provided input.
    */
-  private getAlgorithmName({ key }: {
-    key: { alg?: string, crv?: string };
+  private getAlgorithmName({
+    key,
+  }: {
+    key: { alg?: string; crv?: string };
   }): SupportedAlgorithm {
     const algProperty = key.alg;
     const crvProperty = key.crv;
@@ -507,7 +542,9 @@ export class LocalKeyManager implements
       }
     }
 
-    throw new Error(`Unable to determine algorithm based on provided input: alg=${algProperty}, crv=${crvProperty}`);
+    throw new Error(
+      `Unable to determine algorithm based on provided input: alg=${algProperty}, crv=${crvProperty}`
+    );
   }
 
   /**
@@ -525,7 +562,9 @@ export class LocalKeyManager implements
    *
    * @throws Error if the key is not found in the key store.
    */
-  private async getPrivateKey({ keyUri }: {
+  private async getPrivateKey({
+    keyUri,
+  }: {
     keyUri: KeyIdentifier;
   }): Promise<Jwk> {
     // Get the private key from the key store.

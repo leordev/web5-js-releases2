@@ -1,10 +1,24 @@
-import { Convert } from '@web5/common';
-import { ed25519, edwardsToMontgomeryPub, edwardsToMontgomeryPriv, x25519 } from '@noble/curves/ed25519';
+import { Convert } from "@leordev-web5/common";
+import {
+  ed25519,
+  edwardsToMontgomeryPub,
+  edwardsToMontgomeryPriv,
+  x25519,
+} from "@noble/curves/ed25519";
 
-import type { Jwk } from '../jose/jwk.js';
-import type { ComputePublicKeyParams, GetPublicKeyParams, SignParams, VerifyParams } from '../types/params-direct.js';
+import type { Jwk } from "../jose/jwk.js";
+import type {
+  ComputePublicKeyParams,
+  GetPublicKeyParams,
+  SignParams,
+  VerifyParams,
+} from "../types/params-direct.js";
 
-import { computeJwkThumbprint, isOkpPrivateJwk, isOkpPublicJwk } from '../jose/jwk.js';
+import {
+  computeJwkThumbprint,
+  isOkpPrivateJwk,
+  isOkpPublicJwk,
+} from "../jose/jwk.js";
 
 /**
  * The `Ed25519` class provides a comprehensive suite of utilities for working with the Ed25519
@@ -82,18 +96,20 @@ export class Ed25519 {
    *
    * @returns A Promise that resolves to the private key in JWK format.
    */
-  public static async bytesToPrivateKey({ privateKeyBytes }: {
+  public static async bytesToPrivateKey({
+    privateKeyBytes,
+  }: {
     privateKeyBytes: Uint8Array;
   }): Promise<Jwk> {
     // Derive the public key from the private key.
-    const publicKeyBytes  = ed25519.getPublicKey(privateKeyBytes);
+    const publicKeyBytes = ed25519.getPublicKey(privateKeyBytes);
 
     // Construct the private key in JWK format.
     const privateKey: Jwk = {
-      crv : 'Ed25519',
-      d   : Convert.uint8Array(privateKeyBytes).toBase64Url(),
-      kty : 'OKP',
-      x   : Convert.uint8Array(publicKeyBytes).toBase64Url(),
+      crv: "Ed25519",
+      d: Convert.uint8Array(privateKeyBytes).toBase64Url(),
+      kty: "OKP",
+      x: Convert.uint8Array(publicKeyBytes).toBase64Url(),
     };
 
     // Compute the JWK thumbprint and set as the key ID.
@@ -126,14 +142,16 @@ export class Ed25519 {
    *
    * @returns A Promise that resolves to the public key in JWK format.
    */
-  public static async bytesToPublicKey({ publicKeyBytes }: {
+  public static async bytesToPublicKey({
+    publicKeyBytes,
+  }: {
     publicKeyBytes: Uint8Array;
   }): Promise<Jwk> {
     // Construct the public key in JWK format.
     const publicKey: Jwk = {
-      kty : 'OKP',
-      crv : 'Ed25519',
-      x   : Convert.uint8Array(publicKeyBytes).toBase64Url(),
+      kty: "OKP",
+      crv: "Ed25519",
+      x: Convert.uint8Array(publicKeyBytes).toBase64Url(),
     };
 
     // Compute the JWK thumbprint and set as the key ID.
@@ -163,20 +181,22 @@ export class Ed25519 {
    *
    * @returns A Promise that resolves to the computed public key in JWK format.
    */
-  public static async computePublicKey({ key }:
-    ComputePublicKeyParams
-  ): Promise<Jwk> {
+  public static async computePublicKey({
+    key,
+  }: ComputePublicKeyParams): Promise<Jwk> {
     // Convert the provided private key to a byte array.
-    const privateKeyBytes  = await Ed25519.privateKeyToBytes({ privateKey: key });
+    const privateKeyBytes = await Ed25519.privateKeyToBytes({
+      privateKey: key,
+    });
 
     // Derive the public key from the private key.
-    const publicKeyBytes  = ed25519.getPublicKey(privateKeyBytes);
+    const publicKeyBytes = ed25519.getPublicKey(privateKeyBytes);
 
     // Construct the public key in JWK format.
     const publicKey: Jwk = {
-      kty : 'OKP',
-      crv : 'Ed25519',
-      x   : Convert.uint8Array(publicKeyBytes).toBase64Url()
+      kty: "OKP",
+      crv: "Ed25519",
+      x: Convert.uint8Array(publicKeyBytes).toBase64Url(),
     };
 
     // Compute the JWK thumbprint and set as the key ID.
@@ -207,28 +227,36 @@ export class Ed25519 {
    *
    * @returns A Promise that resolves to the X25519 private key in JWK format.
    */
-  public static async convertPrivateKeyToX25519({ privateKey }: {
+  public static async convertPrivateKeyToX25519({
+    privateKey,
+  }: {
     privateKey: Jwk;
   }): Promise<Jwk> {
     // Convert the provided Ed25519 private key to bytes.
-    const ed25519PrivateKeyBytes = await Ed25519.privateKeyToBytes({ privateKey });
+    const ed25519PrivateKeyBytes = await Ed25519.privateKeyToBytes({
+      privateKey,
+    });
 
     // Convert the Ed25519 private key to an X25519 private key.
-    const x25519PrivateKeyBytes = edwardsToMontgomeryPriv(ed25519PrivateKeyBytes);
+    const x25519PrivateKeyBytes = edwardsToMontgomeryPriv(
+      ed25519PrivateKeyBytes
+    );
 
     // Derive the X25519 public key from the X25519 private key.
     const x25519PublicKeyBytes = x25519.getPublicKey(x25519PrivateKeyBytes);
 
     // Construct the X25519 private key in JWK format.
     const x25519PrivateKey: Jwk = {
-      kty : 'OKP',
-      crv : 'X25519',
-      d   : Convert.uint8Array(x25519PrivateKeyBytes).toBase64Url(),
-      x   : Convert.uint8Array(x25519PublicKeyBytes).toBase64Url(),
+      kty: "OKP",
+      crv: "X25519",
+      d: Convert.uint8Array(x25519PrivateKeyBytes).toBase64Url(),
+      x: Convert.uint8Array(x25519PublicKeyBytes).toBase64Url(),
     };
 
     // Compute the JWK thumbprint and set as the key ID.
-    x25519PrivateKey.kid = await computeJwkThumbprint({ jwk: x25519PrivateKey });
+    x25519PrivateKey.kid = await computeJwkThumbprint({
+      jwk: x25519PrivateKey,
+    });
 
     return x25519PrivateKey;
   }
@@ -255,16 +283,20 @@ export class Ed25519 {
    *
    * @returns A Promise that resolves to the X25519 public key in JWK format.
    */
-  public static async convertPublicKeyToX25519({ publicKey }: {
+  public static async convertPublicKeyToX25519({
+    publicKey,
+  }: {
     publicKey: Jwk;
   }): Promise<Jwk> {
     // Convert the provided private key to a byte array.
     const ed25519PublicKeyBytes = await Ed25519.publicKeyToBytes({ publicKey });
 
     // Verify Edwards public key is valid.
-    const isValid = await Ed25519.validatePublicKey({ publicKeyBytes: ed25519PublicKeyBytes });
+    const isValid = await Ed25519.validatePublicKey({
+      publicKeyBytes: ed25519PublicKeyBytes,
+    });
     if (!isValid) {
-      throw new Error('Ed25519: Invalid public key.');
+      throw new Error("Ed25519: Invalid public key.");
     }
 
     // Convert the Ed25519 public key to an X25519 private key.
@@ -272,9 +304,9 @@ export class Ed25519 {
 
     // Construct the X25519 private key in JWK format.
     const x25519PublicKey: Jwk = {
-      kty : 'OKP',
-      crv : 'X25519',
-      x   : Convert.uint8Array(x25519PublicKeyBytes).toBase64Url(),
+      kty: "OKP",
+      crv: "X25519",
+      x: Convert.uint8Array(x25519PublicKeyBytes).toBase64Url(),
     };
 
     // Compute the JWK thumbprint and set as the key ID.
@@ -346,12 +378,12 @@ export class Ed25519 {
    *
    * @returns A Promise that resolves to the public key in JWK format.
    */
-  public static async getPublicKey({ key }:
-    GetPublicKeyParams
-  ): Promise<Jwk> {
-  // Verify the provided JWK represents an octet key pair (OKP) Ed25519 private key.
-    if (!(isOkpPrivateJwk(key) && key.crv === 'Ed25519')) {
-      throw new Error(`Ed25519: The provided key is not an Ed25519 private JWK.`);
+  public static async getPublicKey({ key }: GetPublicKeyParams): Promise<Jwk> {
+    // Verify the provided JWK represents an octet key pair (OKP) Ed25519 private key.
+    if (!(isOkpPrivateJwk(key) && key.crv === "Ed25519")) {
+      throw new Error(
+        `Ed25519: The provided key is not an Ed25519 private JWK.`
+      );
     }
 
     // Remove the private key property ('d') and make a shallow copy of the provided key.
@@ -384,12 +416,16 @@ export class Ed25519 {
    *
    * @returns A Promise that resolves to the private key as a Uint8Array.
    */
-  public static async privateKeyToBytes({ privateKey }: {
+  public static async privateKeyToBytes({
+    privateKey,
+  }: {
     privateKey: Jwk;
   }): Promise<Uint8Array> {
     // Verify the provided JWK represents a valid OKP private key.
     if (!isOkpPrivateJwk(privateKey)) {
-      throw new Error(`Ed25519: The provided key is not a valid OKP private key.`);
+      throw new Error(
+        `Ed25519: The provided key is not a valid OKP private key.`
+      );
     }
 
     // Decode the provided private key to bytes.
@@ -417,12 +453,16 @@ export class Ed25519 {
    *
    * @returns A Promise that resolves to the public key as a Uint8Array.
    */
-  public static async publicKeyToBytes({ publicKey }: {
+  public static async publicKeyToBytes({
+    publicKey,
+  }: {
     publicKey: Jwk;
   }): Promise<Uint8Array> {
     // Verify the provided JWK represents a valid OKP public key.
     if (!isOkpPublicJwk(publicKey)) {
-      throw new Error(`Ed25519: The provided key is not a valid OKP public key.`);
+      throw new Error(
+        `Ed25519: The provided key is not a valid OKP public key.`
+      );
     }
 
     // Decode the provided public key to bytes.
@@ -455,11 +495,11 @@ export class Ed25519 {
    *
    * @returns A Promise that resolves to the signature as a Uint8Array.
    */
-  public static async sign({ key, data }:
-    SignParams
-  ): Promise<Uint8Array> {
+  public static async sign({ key, data }: SignParams): Promise<Uint8Array> {
     // Convert the private key from JWK format to bytes.
-    const privateKeyBytes = await Ed25519.privateKeyToBytes({ privateKey: key });
+    const privateKeyBytes = await Ed25519.privateKeyToBytes({
+      privateKey: key,
+    });
 
     // Sign the provided data using the EdDSA algorithm.
     const signature = ed25519.sign(data, privateKeyBytes);
@@ -492,17 +532,18 @@ export class Ed25519 {
    * @returns A Promise that resolves to a boolean indicating whether the key
    *          corresponds to a valid point on the Edwards curve.
    */
-  public static async validatePublicKey({ publicKeyBytes }: {
+  public static async validatePublicKey({
+    publicKeyBytes,
+  }: {
     publicKeyBytes: Uint8Array;
   }): Promise<boolean> {
     try {
-    // Decode Edwards points from key bytes.
+      // Decode Edwards points from key bytes.
       const point = ed25519.ExtendedPoint.fromHex(publicKeyBytes);
 
       // Check if points are on the Twisted Edwards curve.
       point.assertValidity();
-
-    } catch(error: any) {
+    } catch (error: any) {
       return false;
     }
 
@@ -534,9 +575,11 @@ export class Ed25519 {
    *
    * @returns A Promise that resolves to a boolean indicating whether the signature is valid.
    */
-  public static async verify({ key, signature, data }:
-    VerifyParams
-  ): Promise<boolean> {
+  public static async verify({
+    key,
+    signature,
+    data,
+  }: VerifyParams): Promise<boolean> {
     // Convert the public key from JWK format to bytes.
     const publicKeyBytes = await Ed25519.publicKeyToBytes({ publicKey: key });
 

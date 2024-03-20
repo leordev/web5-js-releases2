@@ -1,10 +1,17 @@
-import { Convert } from '@web5/common';
-import { x25519 } from '@noble/curves/ed25519';
+import { Convert } from "@leordev-web5/common";
+import { x25519 } from "@noble/curves/ed25519";
 
-import type { Jwk } from '../jose/jwk.js';
-import type { ComputePublicKeyParams, GetPublicKeyParams } from '../types/params-direct.js';
+import type { Jwk } from "../jose/jwk.js";
+import type {
+  ComputePublicKeyParams,
+  GetPublicKeyParams,
+} from "../types/params-direct.js";
 
-import { computeJwkThumbprint, isOkpPrivateJwk, isOkpPublicJwk } from '../jose/jwk.js';
+import {
+  computeJwkThumbprint,
+  isOkpPrivateJwk,
+  isOkpPublicJwk,
+} from "../jose/jwk.js";
 
 /**
  * The `X25519` class provides a comprehensive suite of utilities for working with the X25519
@@ -75,18 +82,20 @@ export class X25519 {
    *
    * @returns A Promise that resolves to the private key in JWK format.
    */
-  public static async bytesToPrivateKey({ privateKeyBytes }: {
+  public static async bytesToPrivateKey({
+    privateKeyBytes,
+  }: {
     privateKeyBytes: Uint8Array;
   }): Promise<Jwk> {
     // Derive the public key from the private key.
-    const publicKeyBytes  = x25519.getPublicKey(privateKeyBytes);
+    const publicKeyBytes = x25519.getPublicKey(privateKeyBytes);
 
     // Construct the private key in JWK format.
     const privateKey: Jwk = {
-      kty : 'OKP',
-      crv : 'X25519',
-      d   : Convert.uint8Array(privateKeyBytes).toBase64Url(),
-      x   : Convert.uint8Array(publicKeyBytes).toBase64Url(),
+      kty: "OKP",
+      crv: "X25519",
+      d: Convert.uint8Array(privateKeyBytes).toBase64Url(),
+      x: Convert.uint8Array(publicKeyBytes).toBase64Url(),
     };
 
     // Compute the JWK thumbprint and set as the key ID.
@@ -123,14 +132,16 @@ export class X25519 {
    *
    * @returns A Promise that resolves to the public key in JWK format.
    */
-  public static async bytesToPublicKey({ publicKeyBytes }: {
+  public static async bytesToPublicKey({
+    publicKeyBytes,
+  }: {
     publicKeyBytes: Uint8Array;
   }): Promise<Jwk> {
     // Construct the public key in JWK format.
     const publicKey: Jwk = {
-      kty : 'OKP',
-      crv : 'X25519',
-      x   : Convert.uint8Array(publicKeyBytes).toBase64Url(),
+      kty: "OKP",
+      crv: "X25519",
+      x: Convert.uint8Array(publicKeyBytes).toBase64Url(),
     };
 
     // Compute the JWK thumbprint and set as the key ID.
@@ -164,20 +175,20 @@ export class X25519 {
    *
    * @returns A Promise that resolves to the derived public key in JWK format.
    */
-  public static async computePublicKey({ key }:
-    ComputePublicKeyParams
-  ): Promise<Jwk> {
+  public static async computePublicKey({
+    key,
+  }: ComputePublicKeyParams): Promise<Jwk> {
     // Convert the provided private key to a byte array.
-    const privateKeyBytes  = await X25519.privateKeyToBytes({ privateKey: key });
+    const privateKeyBytes = await X25519.privateKeyToBytes({ privateKey: key });
 
     // Derive the public key from the private key.
     const publicKeyBytes = x25519.getPublicKey(privateKeyBytes);
 
     // Construct the public key in JWK format.
     const publicKey: Jwk = {
-      kty : 'OKP',
-      crv : 'X25519',
-      x   : Convert.uint8Array(publicKeyBytes).toBase64Url()
+      kty: "OKP",
+      crv: "X25519",
+      x: Convert.uint8Array(publicKeyBytes).toBase64Url(),
     };
 
     // Compute the JWK thumbprint and set as the key ID.
@@ -251,11 +262,9 @@ export class X25519 {
    *
    * @returns A Promise that resolves to the public key in JWK format.
    */
-  public static async getPublicKey({ key }:
-    GetPublicKeyParams
-  ): Promise<Jwk> {
-  // Verify the provided JWK represents an octet key pair (OKP) X25519 private key.
-    if (!(isOkpPrivateJwk(key) && key.crv === 'X25519')) {
+  public static async getPublicKey({ key }: GetPublicKeyParams): Promise<Jwk> {
+    // Verify the provided JWK represents an octet key pair (OKP) X25519 private key.
+    if (!(isOkpPrivateJwk(key) && key.crv === "X25519")) {
       throw new Error(`X25519: The provided key is not an X25519 private JWK.`);
     }
 
@@ -293,12 +302,16 @@ export class X25519 {
    *
    * @returns A Promise that resolves to the private key as a Uint8Array.
    */
-  public static async privateKeyToBytes({ privateKey }: {
+  public static async privateKeyToBytes({
+    privateKey,
+  }: {
     privateKey: Jwk;
   }): Promise<Uint8Array> {
     // Verify the provided JWK represents a valid OKP private key.
     if (!isOkpPrivateJwk(privateKey)) {
-      throw new Error(`X25519: The provided key is not a valid OKP private key.`);
+      throw new Error(
+        `X25519: The provided key is not a valid OKP private key.`
+      );
     }
 
     // Decode the provided private key to bytes.
@@ -330,12 +343,16 @@ export class X25519 {
    *
    * @returns A Promise that resolves to the public key as a Uint8Array.
    */
-  public static async publicKeyToBytes({ publicKey }: {
+  public static async publicKeyToBytes({
+    publicKey,
+  }: {
     publicKey: Jwk;
   }): Promise<Uint8Array> {
     // Verify the provided JWK represents a valid OKP public key.
     if (!isOkpPublicJwk(publicKey)) {
-      throw new Error(`X25519: The provided key is not a valid OKP public key.`);
+      throw new Error(
+        `X25519: The provided key is not a valid OKP public key.`
+      );
     }
 
     // Decode the provided public key to bytes.
@@ -382,21 +399,37 @@ export class X25519 {
    *
    * @returns A Promise that resolves to the computed shared secret as a Uint8Array.
    */
-  public static async sharedSecret({ privateKeyA, publicKeyB }: {
+  public static async sharedSecret({
+    privateKeyA,
+    publicKeyB,
+  }: {
     privateKeyA: Jwk;
     publicKeyB: Jwk;
   }): Promise<Uint8Array> {
     // Ensure that keys from the same key pair are not specified.
-    if ('x' in privateKeyA && 'x' in publicKeyB && privateKeyA.x === publicKeyB.x) {
-      throw new Error(`X25519: ECDH shared secret cannot be computed from a single key pair's public and private keys.`);
+    if (
+      "x" in privateKeyA &&
+      "x" in publicKeyB &&
+      privateKeyA.x === publicKeyB.x
+    ) {
+      throw new Error(
+        `X25519: ECDH shared secret cannot be computed from a single key pair's public and private keys.`
+      );
     }
 
     // Convert the provided private and public keys to bytes.
-    const privateKeyABytes = await X25519.privateKeyToBytes({ privateKey: privateKeyA });
-    const publicKeyBBytes = await X25519.publicKeyToBytes({ publicKey: publicKeyB });
+    const privateKeyABytes = await X25519.privateKeyToBytes({
+      privateKey: privateKeyA,
+    });
+    const publicKeyBBytes = await X25519.publicKeyToBytes({
+      publicKey: publicKeyB,
+    });
 
     // Compute the shared secret between the public and private keys.
-    const sharedSecret = x25519.getSharedSecret(privateKeyABytes, publicKeyBBytes);
+    const sharedSecret = x25519.getSharedSecret(
+      privateKeyABytes,
+      publicKeyBBytes
+    );
 
     return sharedSecret;
   }

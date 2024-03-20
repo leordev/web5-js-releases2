@@ -1,6 +1,6 @@
-import { sha256 } from '@noble/hashes/sha256';
-import { Convert, universalTypeOf } from '@web5/common';
-import { TypedArray, concatBytes } from '@noble/hashes/utils';
+import { sha256 } from "@noble/hashes/sha256";
+import { Convert, universalTypeOf } from "@leordev-web5/common";
+import { TypedArray, concatBytes } from "@noble/hashes/utils";
 
 /**
  * ConcatKDF FixedInfo Parameters.
@@ -45,7 +45,7 @@ export type ConcatKdfFixedInfo = {
    * to the key agreement.
    */
   suppPrivInfo?: string | TypedArray;
-}
+};
 
 /**
  * An implementation of the Concatenation Key Derivation Function (ConcatKDF)
@@ -120,7 +120,11 @@ export class ConcatKdf {
    *
    * @throws {Error} If the `keyDataLen` would require multiple rounds.
    */
-  public static async deriveKey({ keyDataLen, fixedInfo, sharedSecret }: {
+  public static async deriveKey({
+    keyDataLen,
+    fixedInfo,
+    sharedSecret,
+  }: {
     keyDataLen: number;
     fixedInfo: ConcatKdfFixedInfo;
     sharedSecret: Uint8Array;
@@ -146,7 +150,9 @@ export class ConcatKdf {
 
     // Compute K(i) = H(counter || Z || FixedInfo)
     // return concatBytes(counter, sharedSecretZ, fixedInfo);
-    const derivedKeyingMaterial = sha256(concatBytes(counter, sharedSecret, fixedInfoBytes));
+    const derivedKeyingMaterial = sha256(
+      concatBytes(counter, sharedSecret, fixedInfoBytes)
+    );
 
     // Return the bit string of derived keying material of length keyDataLen bits.
     return derivedKeyingMaterial.slice(0, keyDataLen / 8);
@@ -169,19 +175,26 @@ export class ConcatKdf {
    * @param params - Input data to construct FixedInfo.
    * @returns FixedInfo as a Uint8Array.
    */
-  private static computeFixedInfo(params:
-    ConcatKdfFixedInfo
-  ): Uint8Array {
+  private static computeFixedInfo(params: ConcatKdfFixedInfo): Uint8Array {
     // Required sub-fields.
     const algorithmId = ConcatKdf.toDataLenData({ data: params.algorithmId });
     const partyUInfo = ConcatKdf.toDataLenData({ data: params.partyUInfo });
     const partyVInfo = ConcatKdf.toDataLenData({ data: params.partyVInfo });
     // Optional sub-fields.
-    const suppPubInfo = ConcatKdf.toDataLenData({ data: params.suppPubInfo, variableLength: false });
+    const suppPubInfo = ConcatKdf.toDataLenData({
+      data: params.suppPubInfo,
+      variableLength: false,
+    });
     const suppPrivInfo = ConcatKdf.toDataLenData({ data: params.suppPrivInfo });
 
     // Concatenate AlgorithmID || PartyUInfo || PartyVInfo || SuppPubInfo || SuppPrivInfo.
-    const fixedInfo = concatBytes(algorithmId, partyUInfo, partyVInfo, suppPubInfo, suppPrivInfo);
+    const fixedInfo = concatBytes(
+      algorithmId,
+      partyUInfo,
+      partyVInfo,
+      suppPubInfo,
+      suppPrivInfo
+    );
 
     return fixedInfo;
   }
@@ -206,7 +219,10 @@ export class ConcatKdf {
    *
    * @throws {TypeError} If fixed-length data is not a number.
    */
-  private static toDataLenData({ data, variableLength = true }: {
+  private static toDataLenData({
+    data,
+    variableLength = true,
+  }: {
     data: unknown;
     variableLength?: boolean;
   }): Uint8Array {
@@ -214,22 +230,22 @@ export class ConcatKdf {
     const dataType = universalTypeOf(data);
 
     // Return an emtpy octet sequence if data is not specified.
-    if (dataType === 'Undefined') {
+    if (dataType === "Undefined") {
       return new Uint8Array(0);
     }
 
     if (variableLength) {
-      const dataU8A = (dataType === 'Uint8Array')
-        ? data as Uint8Array
-        : new Convert(data, dataType).toUint8Array();
+      const dataU8A =
+        dataType === "Uint8Array"
+          ? (data as Uint8Array)
+          : new Convert(data, dataType).toUint8Array();
       const bufferLength = dataU8A.length;
       encodedData = new Uint8Array(4 + bufferLength);
       new DataView(encodedData.buffer).setUint32(0, bufferLength);
       encodedData.set(dataU8A, 4);
-
     } else {
-      if (typeof data !== 'number') {
-        throw TypeError('Fixed length input must be a number.');
+      if (typeof data !== "number") {
+        throw TypeError("Fixed length input must be a number.");
       }
       encodedData = new Uint8Array(4);
       new DataView(encodedData.buffer).setUint32(0, data);

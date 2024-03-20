@@ -1,23 +1,23 @@
-import { expect } from 'chai';
-import { Convert } from '@web5/common';
+import { expect } from "chai";
+import { Convert } from "@leordev-web5/common";
 
-import type { Jwk } from '../../src/jose/jwk.js';
+import type { Jwk } from "../../src/jose/jwk.js";
 
-import { isChrome } from '../utils/runtimes.js';
-import { randomBytes } from '../../src/utils.js';
-import { AesCtrAlgorithm } from '../../src/algorithms/aes-ctr.js';
+import { isChrome } from "../utils/runtimes.js";
+import { randomBytes } from "../../src/utils.js";
+import { AesCtrAlgorithm } from "../../src/algorithms/aes-ctr.js";
 
-describe('AesCtrAlgorithm', () => {
+describe("AesCtrAlgorithm", () => {
   let aesCtr: AesCtrAlgorithm;
   let dataEncryptionKey: Jwk;
 
   before(async () => {
     aesCtr = new AesCtrAlgorithm();
-    dataEncryptionKey = await aesCtr.generateKey({ algorithm: 'A128CTR' });
+    dataEncryptionKey = await aesCtr.generateKey({ algorithm: "A128CTR" });
   });
 
-  describe('encrypt()', () => {
-    it('returns ciphertext as a Uint8Array', async () => {
+  describe("encrypt()", () => {
+    it("returns ciphertext as a Uint8Array", async () => {
       // Setup.
       const plaintext = new Uint8Array([1, 2, 3, 4]);
       const counter = randomBytes(16); // Initial value of the counter block.
@@ -25,10 +25,10 @@ describe('AesCtrAlgorithm', () => {
 
       // Test the method.
       const ciphertext = await aesCtr.encrypt({
-        key  : dataEncryptionKey,
-        data : plaintext,
+        key: dataEncryptionKey,
+        data: plaintext,
         counter,
-        length
+        length,
       });
 
       // Validate the results.
@@ -37,8 +37,8 @@ describe('AesCtrAlgorithm', () => {
     });
   });
 
-  describe('decrypt()', () => {
-    it('returns plaintext as a Uint8Array', async () => {
+  describe("decrypt()", () => {
+    it("returns plaintext as a Uint8Array", async () => {
       // Setup.
       const ciphertext = new Uint8Array([1, 2, 3, 4]);
       const counter = randomBytes(16); // Initial value of the counter block.
@@ -46,10 +46,10 @@ describe('AesCtrAlgorithm', () => {
 
       // Test the method.
       const plaintext = await aesCtr.decrypt({
-        key  : dataEncryptionKey,
-        data : ciphertext,
+        key: dataEncryptionKey,
+        data: ciphertext,
         counter,
-        length
+        length,
       });
 
       // Validate the results.
@@ -58,37 +58,43 @@ describe('AesCtrAlgorithm', () => {
     });
   });
 
-  describe('generateKey()', () => {
-    it('returns a private key in JWK format', async () => {
-      const privateKey = await aesCtr.generateKey({ algorithm: 'A128CTR' });
+  describe("generateKey()", () => {
+    it("returns a private key in JWK format", async () => {
+      const privateKey = await aesCtr.generateKey({ algorithm: "A128CTR" });
 
-      expect(privateKey).to.have.property('alg', 'A128CTR');
-      expect(privateKey).to.have.property('k');
-      expect(privateKey).to.have.property('kid');
-      expect(privateKey).to.have.property('kty', 'oct');
+      expect(privateKey).to.have.property("alg", "A128CTR");
+      expect(privateKey).to.have.property("k");
+      expect(privateKey).to.have.property("kid");
+      expect(privateKey).to.have.property("kty", "oct");
     });
 
     it(`supports 'A128CTR' and 'A256CTR' algorithms in all supported runtimes`, async () => {
-      const algorithms = ['A128CTR', 'A256CTR'] as const;
+      const algorithms = ["A128CTR", "A256CTR"] as const;
       for (const algorithm of algorithms) {
         const privateKey = await aesCtr.generateKey({ algorithm });
-        expect(privateKey).to.have.property('alg', algorithm);
-        if (!privateKey.k) throw new Error('Expected privateKey to have a `k` property'); // TypeScript type guard.
+        expect(privateKey).to.have.property("alg", algorithm);
+        if (!privateKey.k)
+          throw new Error("Expected privateKey to have a `k` property"); // TypeScript type guard.
         const privateKeyBytes = Convert.base64Url(privateKey.k).toUint8Array();
-        expect(privateKeyBytes.byteLength * 8).to.equal(parseInt(algorithm.slice(1, 4)));
+        expect(privateKeyBytes.byteLength * 8).to.equal(
+          parseInt(algorithm.slice(1, 4))
+        );
       }
     });
 
     it(`supports 'A192CTR' algorithm in all supported runtimes except Chrome browser`, async function () {
       if (isChrome) this.skip();
 
-      const algorithms = ['A192CTR'] as const;
+      const algorithms = ["A192CTR"] as const;
       for (const algorithm of algorithms) {
         const privateKey = await aesCtr.generateKey({ algorithm });
-        expect(privateKey).to.have.property('alg', algorithm);
-        if (!privateKey.k) throw new Error('Expected privateKey to have a `k` property'); // TypeScript type guard.
+        expect(privateKey).to.have.property("alg", algorithm);
+        if (!privateKey.k)
+          throw new Error("Expected privateKey to have a `k` property"); // TypeScript type guard.
         const privateKeyBytes = Convert.base64Url(privateKey.k).toUint8Array();
-        expect(privateKeyBytes.byteLength * 8).to.equal(parseInt(algorithm.slice(1, 4)));
+        expect(privateKeyBytes.byteLength * 8).to.equal(
+          parseInt(algorithm.slice(1, 4))
+        );
       }
     });
   });

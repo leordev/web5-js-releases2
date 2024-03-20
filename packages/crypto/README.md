@@ -401,12 +401,12 @@ To persist keys that are generated or imported, an implementation of the
 [`KeyValueStore`](https://github.com/TBD54566975/web5-js/blob/5f364bc0d859e28f1388524ebe8ef152a71727c4/packages/common/src/types.ts#L4-L43)
 interface can be passed.
 
-For example, to use the [LevelDB](https://github.com/Level/level)-backed store from `@web5/common`:
+For example, to use the [LevelDB](https://github.com/Level/level)-backed store from `@leordev-web5/common`:
 
 ```ts
 import type { KeyIdentifier, Jwk } from "@web5/crypto";
 import { Level } from "level";
-import { LevelStore } from "@web5/common";
+import { LevelStore } from "@leordev-web5/common";
 
 const db = new Level<KeyIdentifier, Jwk>("db_location", {
   valueEncoding: "json",

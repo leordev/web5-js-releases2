@@ -429,6 +429,9 @@ importers:
 
   packages/crypto:
     dependencies:
+      '@leordev-web5/common':
+        specifier: 0.2.4
+        version: link:../common
       '@noble/ciphers':
         specifier: 0.4.1
         version: 0.4.1

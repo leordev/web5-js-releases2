@@ -1,7 +1,7 @@
-import { Convert, removeUndefinedProperties } from '@web5/common';
+import { Convert, removeUndefinedProperties } from "@leordev-web5/common";
 
-import { canonicalize } from './utils.js';
-import { Sha256 } from '../primitives/sha256.js';
+import { canonicalize } from "./utils.js";
+import { Sha256 } from "../primitives/sha256.js";
 
 /**
  * Constant defining the prefix for JSON Web Keys (JWK) key URIs in this library.
@@ -15,7 +15,7 @@ import { Sha256 } from '../primitives/sha256.js';
  * {@link https://datatracker.ietf.org/doc/html/rfc7638 | JWK thumbprint}, derived from the JWK, is
  * unique to the key's material, unaffected by the order or optional properties in the JWK.
  */
-export const KEY_URI_PREFIX_JWK = 'urn:jwk:';
+export const KEY_URI_PREFIX_JWK = "urn:jwk:";
 
 /**
  * JSON Web Key Operations
@@ -47,7 +47,15 @@ export const KEY_URI_PREFIX_JWK = 'urn:jwk:';
  * consistent.  Applications should specify which of these members they
  * use, if either is to be used by the application.
  */
-export type JwkOperation = 'encrypt' | 'decrypt' | 'sign' | 'verify' | 'deriveKey' | 'deriveBits' | 'wrapKey' | 'unwrapKey';
+export type JwkOperation =
+  | "encrypt"
+  | "decrypt"
+  | "sign"
+  | "verify"
+  | "deriveKey"
+  | "deriveBits"
+  | "wrapKey"
+  | "unwrapKey";
 
 /**
  * JSON Web Key Use
@@ -77,7 +85,7 @@ export type JwkOperation = 'encrypt' | 'decrypt' | 'sign' | 'verify' | 'deriveKe
  * "enc" value is also to be used for public keys used for key agreement
  * operations.
  */
-export type JwkUse = 'sig' | 'enc' | string;
+export type JwkUse = "sig" | "enc" | string;
 
 /**
  * JSON Web Key Types
@@ -88,46 +96,46 @@ export type JwkType =
    * Used with Elliptic Curve Digital Signature Algorithm (ECDSA) and Elliptic
    * Curve Diffie-Hellman (ECDH), including secp256k1, P-256, P-384, and P-521.
    */
-  | 'EC'
+  | "EC"
   /**
    * RSA
    * Widely used for encryption and digital signatures. RSA keys are used in
    * various algorithms like RS256, RS384, RS512, etc.
    */
-  | 'RSA'
+  | "RSA"
   /**
    * Octet sequence
    * Used with symmetric signing (e.g., HMAC HS256, HS512, etc.) and
    * symmetric encryption (e.g., A256CBC-HS512, A256GCM, etc.) algorithms.
    */
-  | 'oct'
+  | "oct"
   /**
    * Octet string key pairs (OKP)
    * A type of public key that is used with algorithms such as EdDSA (Ed25519 and
    * Ed448 curves) and ECDH (X25519 and X448 curves).
    */
-  | 'OKP'
+  | "OKP";
 
 /**
  * JSON Web Key Elliptic Curve
  */
 export type JwkNamedCurves =
   // P-256 Curve
-  | 'P-256'
+  | "P-256"
   // P-384 Curve
-  | 'P-384'
+  | "P-384"
   // P-521 Curve
-  | 'P-521'
+  | "P-521"
   // Ed25519 signature algorithm key pairs
-  | 'Ed25519'
+  | "Ed25519"
   // Ed448 signature algorithm key pairs
-  | 'Ed448'
+  | "Ed448"
   // X25519 function key pairs
-  | 'X25519'
+  | "X25519"
   // X448 function key pairs
-  | 'X448'
+  | "X448"
   // SECG secp256k1 curve
-  | 'secp256k1';
+  | "secp256k1";
 
 /**
  * JSON Web Key Parameters
@@ -138,7 +146,7 @@ export type JwkParamsAnyKeyType = {
   /** JWK Algorithm Parameter. The algorithm intended for use with the key. */
   alg?: string;
   /** JWK Extractable Parameter */
-  ext?: 'true' | 'false';
+  ext?: "true" | "false";
   /** JWK Key Operations Parameter */
   key_ops?: JwkOperation[];
   /** JWK Key ID Parameter */
@@ -152,13 +160,13 @@ export type JwkParamsAnyKeyType = {
   /** JWK X.509 Certificate SHA-1 Thumbprint Parameter */
   x5t?: string;
   /** JWK X.509 Certificate SHA-256 Thumbprint Parameter */
-  'x5t#S256'?: string;
+  "x5t#S256"?: string;
   /** JWK X.509 URL Parameter */
   x5u?: string;
-}
+};
 
 /** Parameters used with "EC" (elliptic curve) public keys. */
-export type JwkParamsEcPublic = Omit<JwkParamsAnyKeyType, 'alg' | 'kty'> & {
+export type JwkParamsEcPublic = Omit<JwkParamsAnyKeyType, "alg" | "kty"> & {
   /**
    * The algorithm intended for use with the key.
    * ES256  : ECDSA using P-256 and SHA-256
@@ -166,18 +174,18 @@ export type JwkParamsEcPublic = Omit<JwkParamsAnyKeyType, 'alg' | 'kty'> & {
    * ES384  : ECDSA using P-384 and SHA-384
    * ES512  : ECDSA using P-521 and SHA-512
    */
-  alg?: 'ES256' | 'ES256K' | 'ES384' | 'ES512';
+  alg?: "ES256" | "ES256K" | "ES384" | "ES512";
 
   /**
    * Elliptic Curve key pair.
    */
-  kty: 'EC';
+  kty: "EC";
 
   /**
    * The cryptographic curve used with the key.
    * MUST be present for all EC public keys.
    */
-  crv: 'secp256k1' | 'P-256' | 'P-384' | 'P-521';
+  crv: "secp256k1" | "P-256" | "P-384" | "P-521";
 
   /**
    * The x-coordinate for the Elliptic Curve point.
@@ -194,7 +202,7 @@ export type JwkParamsEcPublic = Omit<JwkParamsAnyKeyType, 'alg' | 'kty'> & {
    * MUST be present only for secp256k1 public keys.
    */
   y?: string;
-}
+};
 
 /** Parameters used with "EC" (elliptic curve) private keys. */
 export type JwkParamsEcPrivate = JwkParamsEcPublic & {
@@ -205,31 +213,33 @@ export type JwkParamsEcPrivate = JwkParamsEcPublic & {
    * MUST be present for all EC private keys.
    */
   d: string;
-}
+};
 
 /** Parameters used with "OKP" (octet key pair) public keys. */
-export type JwkParamsOkpPublic =
-  Omit<JwkParamsAnyKeyType, 'kty' | 'alg' | 'crv'> &
-  Pick<JwkParamsEcPublic, 'x'> & {
-  /**
-   * The algorithm intended for use with the key.
-   * EdDSA: Edwards Curve Digital Signature Algorithm
-   */
-  alg?: 'EdDSA';
+export type JwkParamsOkpPublic = Omit<
+  JwkParamsAnyKeyType,
+  "kty" | "alg" | "crv"
+> &
+  Pick<JwkParamsEcPublic, "x"> & {
+    /**
+     * The algorithm intended for use with the key.
+     * EdDSA: Edwards Curve Digital Signature Algorithm
+     */
+    alg?: "EdDSA";
 
-  /**
-   * The cryptographic curve used with the key.
-   * MUST be present for all OKP public keys.
-   */
-  crv: 'Ed25519' | 'Ed448' | 'X25519' | 'X448';
+    /**
+     * The cryptographic curve used with the key.
+     * MUST be present for all OKP public keys.
+     */
+    crv: "Ed25519" | "Ed448" | "X25519" | "X448";
 
-  /**
-   * Key type
-   * OKP (Octet Key Pair) is defined for public key algorithms that use octet
-   * strings as private and public keys.
-   */
-  kty: 'OKP';
-}
+    /**
+     * Key type
+     * OKP (Octet Key Pair) is defined for public key algorithms that use octet
+     * strings as private and public keys.
+     */
+    kty: "OKP";
+  };
 
 /** Parameters used with "OKP" (octet key pair) private keys. */
 export type JwkParamsOkpPrivate = JwkParamsOkpPublic & {
@@ -243,37 +253,36 @@ export type JwkParamsOkpPrivate = JwkParamsOkpPublic & {
 };
 
 /** Parameters used with "oct" (octet sequence) private keys. */
-export type JwkParamsOctPrivate = Omit<JwkParamsAnyKeyType, 'alg' | 'kty'> & {
+export type JwkParamsOctPrivate = Omit<JwkParamsAnyKeyType, "alg" | "kty"> & {
   /**
    * The algorithm intended for use with the key.
    * Used with symmetric signing (e.g., HMAC HS256, etc.) and
    * symmetric encryption (e.g., A256GCM, etc.) algorithms.
    */
-  alg?:
-    // AES CBC using 128-bit key
-    | 'A128CBC'
+  alg?: // AES CBC using 128-bit key
+  | "A128CBC"
     // AES CBC using 192-bit key
-    | 'A192CBC'
+    | "A192CBC"
     // AES CBC using 256-bit key
-    | 'A256CBC'
+    | "A256CBC"
     // AES CTR using 128-bit key
-    | 'A128CTR'
+    | "A128CTR"
     // AES CTR using 192-bit key
-    | 'A192CTR'
+    | "A192CTR"
     // AES CTR using 256-bit key
-    | 'A256CTR'
+    | "A256CTR"
     // AES GCM using a 128-bit key
-    | 'A128GCM'
+    | "A128GCM"
     // AES GCM using a 192-bit key
-    | 'A192GCM'
+    | "A192GCM"
     // AES GCM using a 256-bit key
-    | 'A256GCM'
+    | "A256GCM"
     // HMAC using SHA-256
-    | 'HS256'
+    | "HS256"
     // HMAC using SHA-384
-    | 'HS384'
+    | "HS384"
     // HMAC using SHA-512
-    | 'HS512'
+    | "HS512";
 
   /**
    * The "k" (key value) parameter contains the value of the symmetric
@@ -287,11 +296,11 @@ export type JwkParamsOctPrivate = Omit<JwkParamsAnyKeyType, 'alg' | 'kty'> & {
    * oct (Octet Sequence) is defined for symmetric encryption and
    * symmetric signature algorithms.
    */
-  kty: 'oct';
-}
+  kty: "oct";
+};
 
 /** Parameters Used with "RSA" public keys. */
-export type JwkParamsRsaPublic = Omit<JwkParamsAnyKeyType, 'kty'> & {
+export type JwkParamsRsaPublic = Omit<JwkParamsAnyKeyType, "kty"> & {
   /** Public exponent for RSA */
   e: string;
 
@@ -299,7 +308,7 @@ export type JwkParamsRsaPublic = Omit<JwkParamsAnyKeyType, 'kty'> & {
    * Key type
    * RSA is widely used for encryption and digital signatures.
    */
-  kty: 'RSA';
+  kty: "RSA";
 
   /** Modulus for RSA */
   n: string;
@@ -331,10 +340,17 @@ export type JwkParamsRsaPrivate = JwkParamsRsaPublic & {
 };
 
 /** Parameters used with public keys in JWK format. */
-export type PublicKeyJwk = JwkParamsEcPublic | JwkParamsOkpPublic | JwkParamsRsaPublic;
+export type PublicKeyJwk =
+  | JwkParamsEcPublic
+  | JwkParamsOkpPublic
+  | JwkParamsRsaPublic;
 
 /** Parameters used with private keys in JWK format. */
-export type PrivateKeyJwk = JwkParamsEcPrivate | JwkParamsOkpPrivate | JwkParamsOctPrivate | JwkParamsRsaPrivate;
+export type PrivateKeyJwk =
+  | JwkParamsEcPrivate
+  | JwkParamsOkpPrivate
+  | JwkParamsOctPrivate
+  | JwkParamsRsaPrivate;
 
 /**
  * JSON Web Key ({@link https://datatracker.ietf.org/doc/html/rfc7517 | JWK}).
@@ -346,7 +362,7 @@ export interface Jwk {
   /** JWK Algorithm Parameter. The algorithm intended for use with the key. */
   alg?: string;
   /** JWK Extractable Parameter */
-  ext?: 'true' | 'false';
+  ext?: "true" | "false";
   /** JWK Key Operations Parameter */
   key_ops?: JwkOperation[];
   /** JWK Key ID Parameter */
@@ -360,7 +376,7 @@ export interface Jwk {
   /** JWK X.509 Certificate SHA-1 Thumbprint Parameter */
   x5t?: string;
   /** JWK X.509 Certificate SHA-256 Thumbprint Parameter */
-  'x5t#S256'?: string;
+  "x5t#S256"?: string;
   /** JWK X.509 URL Parameter */
   x5u?: string;
 
@@ -427,7 +443,7 @@ export interface Jwk {
  */
 export interface JwkSet {
   /** Array of JWKs */
-  keys: Jwk[]
+  keys: Jwk[];
 }
 
 /**
@@ -475,21 +491,23 @@ export interface JwkSet {
  * @returns The thumbprint as a base64url encoded string.
  * @throws Throws an `Error` if the provided key type is unsupported.
  */
-export async function computeJwkThumbprint({ jwk }: {
-  jwk: Jwk
+export async function computeJwkThumbprint({
+  jwk,
+}: {
+  jwk: Jwk;
 }): Promise<string> {
   /** Step 1 - Normalization: The JWK is normalized to include only specific
    * members and in lexicographic order.
    */
   const keyType = jwk.kty;
   let normalizedJwk: Jwk;
-  if (keyType === 'EC') {
+  if (keyType === "EC") {
     normalizedJwk = { crv: jwk.crv, kty: jwk.kty, x: jwk.x, y: jwk.y };
-  } else if (keyType === 'oct') {
+  } else if (keyType === "oct") {
     normalizedJwk = { k: jwk.k, kty: jwk.kty };
-  } else if (keyType === 'OKP') {
+  } else if (keyType === "OKP") {
     normalizedJwk = { crv: jwk.crv, kty: jwk.kty, x: jwk.x };
-  } else if (keyType === 'RSA') {
+  } else if (keyType === "RSA") {
     normalizedJwk = { e: jwk.e, kty: jwk.kty, n: jwk.n };
   } else {
     throw new Error(`Unsupported key type: ${keyType}`);
@@ -519,11 +537,11 @@ export async function computeJwkThumbprint({ jwk }: {
  * @returns True if the object is a valid EC private JWK; otherwise, false.
  */
 export function isEcPrivateJwk(obj: unknown): obj is JwkParamsEcPrivate {
-  if (!obj || typeof obj !== 'object') return false;
-  if (!('kty' in obj && 'crv' in obj && 'x' in obj && 'd' in obj)) return false;
-  if (obj.kty !== 'EC') return false;
-  if (typeof obj.d !== 'string') return false;
-  if (typeof obj.x !== 'string') return false;
+  if (!obj || typeof obj !== "object") return false;
+  if (!("kty" in obj && "crv" in obj && "x" in obj && "d" in obj)) return false;
+  if (obj.kty !== "EC") return false;
+  if (typeof obj.d !== "string") return false;
+  if (typeof obj.x !== "string") return false;
   return true;
 }
 
@@ -534,11 +552,11 @@ export function isEcPrivateJwk(obj: unknown): obj is JwkParamsEcPrivate {
  * @returns True if the object is a valid EC public JWK; otherwise, false.
  */
 export function isEcPublicJwk(obj: unknown): obj is JwkParamsEcPublic {
-  if (!obj || typeof obj !== 'object') return false;
-  if (!('kty' in obj && 'crv' in obj && 'x' in obj)) return false;
-  if ('d' in obj) return false;
-  if (obj.kty !== 'EC') return false;
-  if (typeof obj.x !== 'string') return false;
+  if (!obj || typeof obj !== "object") return false;
+  if (!("kty" in obj && "crv" in obj && "x" in obj)) return false;
+  if ("d" in obj) return false;
+  if (obj.kty !== "EC") return false;
+  if (typeof obj.x !== "string") return false;
   return true;
 }
 
@@ -549,10 +567,10 @@ export function isEcPublicJwk(obj: unknown): obj is JwkParamsEcPublic {
  * @returns True if the object is a valid oct private JWK; otherwise, false.
  */
 export function isOctPrivateJwk(obj: unknown): obj is JwkParamsOctPrivate {
-  if (!obj || typeof obj !== 'object') return false;
-  if (!('kty' in obj && 'k' in obj)) return false;
-  if (obj.kty !== 'oct') return false;
-  if (typeof obj.k !== 'string') return false;
+  if (!obj || typeof obj !== "object") return false;
+  if (!("kty" in obj && "k" in obj)) return false;
+  if (obj.kty !== "oct") return false;
+  if (typeof obj.k !== "string") return false;
   return true;
 }
 
@@ -563,11 +581,11 @@ export function isOctPrivateJwk(obj: unknown): obj is JwkParamsOctPrivate {
  * @returns True if the object is a valid OKP private JWK; otherwise, false.
  */
 export function isOkpPrivateJwk(obj: unknown): obj is JwkParamsOkpPrivate {
-  if (!obj || typeof obj !== 'object') return false;
-  if (!('kty' in obj && 'crv' in obj && 'x' in obj && 'd' in obj)) return false;
-  if (obj.kty !== 'OKP') return false;
-  if (typeof obj.d !== 'string') return false;
-  if (typeof obj.x !== 'string') return false;
+  if (!obj || typeof obj !== "object") return false;
+  if (!("kty" in obj && "crv" in obj && "x" in obj && "d" in obj)) return false;
+  if (obj.kty !== "OKP") return false;
+  if (typeof obj.d !== "string") return false;
+  if (typeof obj.x !== "string") return false;
   return true;
 }
 
@@ -578,11 +596,11 @@ export function isOkpPrivateJwk(obj: unknown): obj is JwkParamsOkpPrivate {
  * @returns True if the object is a valid OKP public JWK; otherwise, false.
  */
 export function isOkpPublicJwk(obj: unknown): obj is JwkParamsOkpPublic {
-  if (!obj || typeof obj !== 'object') return false;
-  if ('d' in obj) return false;
-  if (!('kty' in obj && 'crv' in obj && 'x' in obj)) return false;
-  if (obj.kty !== 'OKP') return false;
-  if (typeof obj.x !== 'string') return false;
+  if (!obj || typeof obj !== "object") return false;
+  if ("d" in obj) return false;
+  if (!("kty" in obj && "crv" in obj && "x" in obj)) return false;
+  if (obj.kty !== "OKP") return false;
+  if (typeof obj.x !== "string") return false;
   return true;
 }
 
@@ -593,17 +611,17 @@ export function isOkpPublicJwk(obj: unknown): obj is JwkParamsOkpPublic {
  * @returns True if the object is a valid private JWK; otherwise, false.
  */
 export function isPrivateJwk(obj: unknown): obj is PrivateKeyJwk {
-  if (!obj || typeof obj !== 'object') return false;
+  if (!obj || typeof obj !== "object") return false;
 
   const kty = (obj as { kty: string }).kty;
 
   switch (kty) {
-    case 'EC':
-    case 'OKP':
-    case 'RSA':
-      return 'd' in obj;
-    case 'oct':
-      return 'k' in obj;
+    case "EC":
+    case "OKP":
+    case "RSA":
+      return "d" in obj;
+    case "oct":
+      return "k" in obj;
     default:
       return false;
   }
@@ -616,16 +634,16 @@ export function isPrivateJwk(obj: unknown): obj is PrivateKeyJwk {
  * @returns True if the object is a valid public JWK; otherwise, false.
  */
 export function isPublicJwk(obj: unknown): obj is PublicKeyJwk {
-  if (!obj || typeof obj !== 'object') return false;
+  if (!obj || typeof obj !== "object") return false;
 
   const kty = (obj as { kty: string }).kty;
 
   switch (kty) {
-    case 'EC':
-    case 'OKP':
-      return 'x' in obj && !('d' in obj);
-    case 'RSA':
-      return 'n' in obj && 'e' in obj && !('d' in obj);
+    case "EC":
+    case "OKP":
+      return "x" in obj && !("d" in obj);
+    case "RSA":
+      return "n" in obj && "e" in obj && !("d" in obj);
     default:
       return false;
   }

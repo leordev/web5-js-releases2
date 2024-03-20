@@ -1,14 +1,23 @@
-import type { AffinePoint } from '@noble/curves/abstract/weierstrass';
+import type { AffinePoint } from "@noble/curves/abstract/weierstrass";
 
-import { Convert } from '@web5/common';
-import { sha256 } from '@noble/hashes/sha256';
-import { secp256k1 } from '@noble/curves/secp256k1';
-import { numberToBytesBE } from '@noble/curves/abstract/utils';
+import { Convert } from "@leordev-web5/common";
+import { sha256 } from "@noble/hashes/sha256";
+import { secp256k1 } from "@noble/curves/secp256k1";
+import { numberToBytesBE } from "@noble/curves/abstract/utils";
 
-import type { Jwk } from '../jose/jwk.js';
-import type { ComputePublicKeyParams, GetPublicKeyParams, SignParams, VerifyParams } from '../types/params-direct.js';
+import type { Jwk } from "../jose/jwk.js";
+import type {
+  ComputePublicKeyParams,
+  GetPublicKeyParams,
+  SignParams,
+  VerifyParams,
+} from "../types/params-direct.js";
 
-import { computeJwkThumbprint, isEcPrivateJwk, isEcPublicJwk } from '../jose/jwk.js';
+import {
+  computeJwkThumbprint,
+  isEcPrivateJwk,
+  isEcPublicJwk,
+} from "../jose/jwk.js";
 
 /**
  * The `Secp256k1` class provides a comprehensive suite of utilities for working with
@@ -119,7 +128,9 @@ export class Secp256k1 {
    *
    * @returns A Promise that resolves to the adjusted signature in low-S form as a `Uint8Array`.
    */
-  public static async adjustSignatureToLowS({ signature }: {
+  public static async adjustSignatureToLowS({
+    signature,
+  }: {
     signature: Uint8Array;
   }): Promise<Uint8Array> {
     // Convert the signature to a `secp256k1.Signature` object.
@@ -133,7 +144,6 @@ export class Secp256k1 {
       const adjustedSignature = adjustedSignatureObject.toCompactRawBytes();
 
       return adjustedSignature;
-
     } else {
       // Return the unmodified signature if it is already in low-S format.
       return signature;
@@ -171,7 +181,9 @@ export class Secp256k1 {
    *
    * @returns A Promise that resolves to the private key in JWK format.
    */
-  public static async bytesToPrivateKey({ privateKeyBytes }: {
+  public static async bytesToPrivateKey({
+    privateKeyBytes,
+  }: {
     privateKeyBytes: Uint8Array;
   }): Promise<Jwk> {
     // Get the elliptic curve point (x and y coordinates) for the provided private key.
@@ -179,11 +191,11 @@ export class Secp256k1 {
 
     // Construct the private key in JWK format.
     const privateKey: Jwk = {
-      kty : 'EC',
-      crv : 'secp256k1',
-      d   : Convert.uint8Array(privateKeyBytes).toBase64Url(),
-      x   : Convert.uint8Array(point.x).toBase64Url(),
-      y   : Convert.uint8Array(point.y).toBase64Url()
+      kty: "EC",
+      crv: "secp256k1",
+      d: Convert.uint8Array(privateKeyBytes).toBase64Url(),
+      x: Convert.uint8Array(point.x).toBase64Url(),
+      y: Convert.uint8Array(point.y).toBase64Url(),
     };
 
     // Compute the JWK thumbprint and set as the key ID.
@@ -222,7 +234,9 @@ export class Secp256k1 {
    *
    * @returns A Promise that resolves to the public key in JWK format.
    */
-  public static async bytesToPublicKey({ publicKeyBytes }: {
+  public static async bytesToPublicKey({
+    publicKeyBytes,
+  }: {
     publicKeyBytes: Uint8Array;
   }): Promise<Jwk> {
     // Get the elliptic curve point (x and y coordinates) for the provided public key.
@@ -230,10 +244,10 @@ export class Secp256k1 {
 
     // Construct the public key in JWK format.
     const publicKey: Jwk = {
-      kty : 'EC',
-      crv : 'secp256k1',
-      x   : Convert.uint8Array(point.x).toBase64Url(),
-      y   : Convert.uint8Array(point.y).toBase64Url()
+      kty: "EC",
+      crv: "secp256k1",
+      x: Convert.uint8Array(point.x).toBase64Url(),
+      y: Convert.uint8Array(point.y).toBase64Url(),
     };
 
     // Compute the JWK thumbprint and set as the key ID.
@@ -264,7 +278,9 @@ export class Secp256k1 {
    *
    * @returns A Promise that resolves to the compressed public key as a Uint8Array.
    */
-  public static async compressPublicKey({ publicKeyBytes }: {
+  public static async compressPublicKey({
+    publicKeyBytes,
+  }: {
     publicKeyBytes: Uint8Array;
   }): Promise<Uint8Array> {
     // Decode Weierstrass points from the public key byte array.
@@ -300,21 +316,23 @@ export class Secp256k1 {
    *
    * @returns A Promise that resolves to the derived public key in JWK format.
    */
-  public static async computePublicKey({ key }:
-    ComputePublicKeyParams
-  ): Promise<Jwk> {
+  public static async computePublicKey({
+    key,
+  }: ComputePublicKeyParams): Promise<Jwk> {
     // Convert the provided private key to a byte array.
-    const privateKeyBytes  = await Secp256k1.privateKeyToBytes({ privateKey: key });
+    const privateKeyBytes = await Secp256k1.privateKeyToBytes({
+      privateKey: key,
+    });
 
     // Get the elliptic curve point (x and y coordinates) for the provided private key.
     const point = await Secp256k1.getCurvePoint({ keyBytes: privateKeyBytes });
 
     // Construct the public key in JWK format.
     const publicKey: Jwk = {
-      kty : 'EC',
-      crv : 'secp256k1',
-      x   : Convert.uint8Array(point.x).toBase64Url(),
-      y   : Convert.uint8Array(point.y).toBase64Url()
+      kty: "EC",
+      crv: "secp256k1",
+      x: Convert.uint8Array(point.x).toBase64Url(),
+      y: Convert.uint8Array(point.y).toBase64Url(),
     };
 
     // Compute the JWK thumbprint and set as the key ID.
@@ -346,7 +364,9 @@ export class Secp256k1 {
    *
    * @returns A Promise that resolves to the signature in compact R+S format as a `Uint8Array`.
    */
-  public static async convertDerToCompactSignature({ derSignature }: {
+  public static async convertDerToCompactSignature({
+    derSignature,
+  }: {
     derSignature: Uint8Array;
   }): Promise<Uint8Array> {
     // Convert the DER-encoded signature into a `secp256k1.Signature` object.
@@ -357,7 +377,7 @@ export class Secp256k1 {
     // into a single byte array.
     const compactSignature = signatureObject.toCompactRawBytes();
 
-    return  compactSignature;
+    return compactSignature;
   }
 
   /**
@@ -382,7 +402,9 @@ export class Secp256k1 {
    *
    * @returns A Promise that resolves to the uncompressed public key as a Uint8Array.
    */
-  public static async decompressPublicKey({ publicKeyBytes }: {
+  public static async decompressPublicKey({
+    publicKeyBytes,
+  }: {
     publicKeyBytes: Uint8Array;
   }): Promise<Uint8Array> {
     // Decode Weierstrass points from the public key byte array.
@@ -459,12 +481,12 @@ export class Secp256k1 {
    *
    * @returns A Promise that resolves to the public key in JWK format.
    */
-  public static async getPublicKey({ key }:
-    GetPublicKeyParams
-  ): Promise<Jwk> {
+  public static async getPublicKey({ key }: GetPublicKeyParams): Promise<Jwk> {
     // Verify the provided JWK represents an elliptic curve (EC) secp256k1 private key.
-    if (!(isEcPrivateJwk(key) && key.crv === 'secp256k1')) {
-      throw new Error(`Secp256k1: The provided key is not a secp256k1 private JWK.`);
+    if (!(isEcPrivateJwk(key) && key.crv === "secp256k1")) {
+      throw new Error(
+        `Secp256k1: The provided key is not a secp256k1 private JWK.`
+      );
     }
 
     // Remove the private key property ('d') and make a shallow copy of the provided key.
@@ -499,12 +521,16 @@ export class Secp256k1 {
    *
    * @returns A Promise that resolves to the private key as a Uint8Array.
    */
-  public static async privateKeyToBytes({ privateKey }: {
+  public static async privateKeyToBytes({
+    privateKey,
+  }: {
     privateKey: Jwk;
   }): Promise<Uint8Array> {
     // Verify the provided JWK represents a valid EC secp256k1 private key.
     if (!isEcPrivateJwk(privateKey)) {
-      throw new Error(`Secp256k1: The provided key is not a valid EC private key.`);
+      throw new Error(
+        `Secp256k1: The provided key is not a valid EC private key.`
+      );
     }
 
     // Decode the provided private key to bytes.
@@ -538,12 +564,16 @@ export class Secp256k1 {
    *
    * @returns A Promise that resolves to the public key as a Uint8Array.
    */
-  public static async publicKeyToBytes({ publicKey }: {
+  public static async publicKeyToBytes({
+    publicKey,
+  }: {
     publicKey: Jwk;
   }): Promise<Uint8Array> {
     // Verify the provided JWK represents a valid EC secp256k1 public key, which must have a 'y' value.
     if (!(isEcPublicJwk(publicKey) && publicKey.y)) {
-      throw new Error(`Secp256k1: The provided key is not a valid EC public key.`);
+      throw new Error(
+        `Secp256k1: The provided key is not a valid EC public key.`
+      );
     }
 
     // Decode the provided public key to bytes.
@@ -595,21 +625,38 @@ export class Secp256k1 {
    *
    * @returns A Promise that resolves to the computed shared secret as a Uint8Array.
    */
-  public static async sharedSecret({ privateKeyA, publicKeyB }: {
+  public static async sharedSecret({
+    privateKeyA,
+    publicKeyB,
+  }: {
     privateKeyA: Jwk;
     publicKeyB: Jwk;
   }): Promise<Uint8Array> {
     // Ensure that keys from the same key pair are not specified.
-    if ('x' in privateKeyA && 'x' in publicKeyB && privateKeyA.x === publicKeyB.x) {
-      throw new Error(`Secp256k1: ECDH shared secret cannot be computed from a single key pair's public and private keys.`);
+    if (
+      "x" in privateKeyA &&
+      "x" in publicKeyB &&
+      privateKeyA.x === publicKeyB.x
+    ) {
+      throw new Error(
+        `Secp256k1: ECDH shared secret cannot be computed from a single key pair's public and private keys.`
+      );
     }
 
     // Convert the provided private and public keys to bytes.
-    const privateKeyABytes = await Secp256k1.privateKeyToBytes({ privateKey: privateKeyA });
-    const publicKeyBBytes = await Secp256k1.publicKeyToBytes({ publicKey: publicKeyB });
+    const privateKeyABytes = await Secp256k1.privateKeyToBytes({
+      privateKey: privateKeyA,
+    });
+    const publicKeyBBytes = await Secp256k1.publicKeyToBytes({
+      publicKey: publicKeyB,
+    });
 
     // Compute the compact representation shared secret between the public and private keys.
-    const sharedSecret = secp256k1.getSharedSecret(privateKeyABytes, publicKeyBBytes, true);
+    const sharedSecret = secp256k1.getSharedSecret(
+      privateKeyABytes,
+      publicKeyBBytes,
+      true
+    );
 
     // Remove the leading byte that indicates the sign of the y-coordinate
     // of the point on the elliptic curve.  See note above.
@@ -647,11 +694,11 @@ export class Secp256k1 {
    *
    * @returns A Promise that resolves to the signature as a Uint8Array.
    */
-  public static async sign({ data, key }:
-    SignParams
-  ): Promise<Uint8Array> {
+  public static async sign({ data, key }: SignParams): Promise<Uint8Array> {
     // Convert the private key from JWK format to bytes.
-    const privateKeyBytes = await Secp256k1.privateKeyToBytes({ privateKey: key });
+    const privateKeyBytes = await Secp256k1.privateKeyToBytes({
+      privateKey: key,
+    });
 
     // Generate a digest of the data using the SHA-256 hash function.
     const digest = sha256(data);
@@ -690,7 +737,9 @@ export class Secp256k1 {
    *
    * @returns A Promise that resolves to a boolean indicating whether the private key is valid.
    */
-  public static async validatePrivateKey({ privateKeyBytes }: {
+  public static async validatePrivateKey({
+    privateKeyBytes,
+  }: {
     privateKeyBytes: Uint8Array;
   }): Promise<boolean> {
     return secp256k1.utils.isValidPrivateKey(privateKeyBytes);
@@ -722,7 +771,9 @@ export class Secp256k1 {
    * @returns A Promise that resolves to a boolean indicating the public key's validity on
    *          the secp256k1 curve.
    */
-  public static async validatePublicKey({ publicKeyBytes }: {
+  public static async validatePublicKey({
+    publicKeyBytes,
+  }: {
     publicKeyBytes: Uint8Array;
   }): Promise<boolean> {
     try {
@@ -731,8 +782,7 @@ export class Secp256k1 {
 
       // Check if points are on the Short Weierstrass curve.
       point.assertValidity();
-
-    } catch(error: any) {
+    } catch (error: any) {
       return false;
     }
 
@@ -776,9 +826,11 @@ export class Secp256k1 {
    *
    * @returns A Promise that resolves to a boolean indicating whether the signature is valid.
    */
-  public static async verify({ key, signature, data }:
-    VerifyParams
-  ): Promise<boolean> {
+  public static async verify({
+    key,
+    signature,
+    data,
+  }: VerifyParams): Promise<boolean> {
     // Convert the public key from JWK format to bytes.
     const publicKeyBytes = await Secp256k1.publicKeyToBytes({ publicKey: key });
 
@@ -790,7 +842,9 @@ export class Secp256k1 {
      * for low-s signatures across languages is unlikely especially in the context
      * of SSI. Notable Cloud KMS providers do not natively support it either. It is
      * also worth noting that low-s signatures are a requirement for Bitcoin. */
-    const isValid = secp256k1.verify(signature, digest, publicKeyBytes, { lowS: false });
+    const isValid = secp256k1.verify(signature, digest, publicKeyBytes, {
+      lowS: false,
+    });
 
     return isValid;
   }
@@ -828,7 +882,9 @@ export class Secp256k1 {
    *          each being a Uint8Array representing the x and y coordinates of the key point on the
    *          elliptic curve.
    */
-  private static async getCurvePoint({ keyBytes }: {
+  private static async getCurvePoint({
+    keyBytes,
+  }: {
     keyBytes: Uint8Array;
   }): Promise<AffinePoint<Uint8Array>> {
     // If key is a private key, first compute the public key.

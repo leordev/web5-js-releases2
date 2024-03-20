@@ -1,10 +1,10 @@
-import { Convert } from '@web5/common';
-import { xchacha20poly1305 } from '@noble/ciphers/chacha';
-import { getWebcryptoSubtle } from '@noble/ciphers/webcrypto/utils';
+import { Convert } from "@leordev-web5/common";
+import { xchacha20poly1305 } from "@noble/ciphers/chacha";
+import { getWebcryptoSubtle } from "@noble/ciphers/webcrypto/utils";
 
-import type { Jwk } from '../jose/jwk.js';
+import type { Jwk } from "../jose/jwk.js";
 
-import { computeJwkThumbprint, isOctPrivateJwk } from '../jose/jwk.js';
+import { computeJwkThumbprint, isOctPrivateJwk } from "../jose/jwk.js";
 
 /**
  * Constant defining the length of the authentication tag in bytes for XChaCha20-Poly1305.
@@ -91,13 +91,15 @@ export class XChaCha20Poly1305 {
    *
    * @returns A Promise that resolves to the symmetric key in JWK format.
    */
-  public static async bytesToPrivateKey({ privateKeyBytes }: {
+  public static async bytesToPrivateKey({
+    privateKeyBytes,
+  }: {
     privateKeyBytes: Uint8Array;
   }): Promise<Jwk> {
     // Construct the private key in JWK format.
     const privateKey: Jwk = {
-      k   : Convert.uint8Array(privateKeyBytes).toBase64Url(),
-      kty : 'oct'
+      k: Convert.uint8Array(privateKeyBytes).toBase64Url(),
+      kty: "oct",
     };
 
     // Compute the JWK thumbprint and set as the key ID.
@@ -138,14 +140,21 @@ export class XChaCha20Poly1305 {
    *
    * @returns A Promise that resolves to the decrypted data as a Uint8Array.
    */
-  public static async decrypt({ data, key, nonce, additionalData }: {
+  public static async decrypt({
+    data,
+    key,
+    nonce,
+    additionalData,
+  }: {
     additionalData?: Uint8Array;
     data: Uint8Array;
     key: Jwk;
     nonce: Uint8Array;
   }): Promise<Uint8Array> {
     // Convert the private key from JWK format to bytes.
-    const privateKeyBytes = await XChaCha20Poly1305.privateKeyToBytes({ privateKey: key });
+    const privateKeyBytes = await XChaCha20Poly1305.privateKeyToBytes({
+      privateKey: key,
+    });
 
     const xc20p = xchacha20poly1305(privateKeyBytes, nonce, additionalData);
     const plaintext = xc20p.decrypt(data);
@@ -186,14 +195,21 @@ export class XChaCha20Poly1305 {
    * @returns A Promise that resolves to a byte array containing the encrypted data and the
    *          authentication tag.
    */
-  public static async encrypt({ data, key, nonce, additionalData}: {
+  public static async encrypt({
+    data,
+    key,
+    nonce,
+    additionalData,
+  }: {
     additionalData?: Uint8Array;
     data: Uint8Array;
     key: Jwk;
     nonce: Uint8Array;
   }): Promise<Uint8Array> {
     // Convert the private key from JWK format to bytes.
-    const privateKeyBytes = await XChaCha20Poly1305.privateKeyToBytes({ privateKey: key });
+    const privateKeyBytes = await XChaCha20Poly1305.privateKeyToBytes({
+      privateKey: key,
+    });
 
     const xc20p = xchacha20poly1305(privateKeyBytes, nonce, additionalData);
     const ciphertext = xc20p.encrypt(data);
@@ -229,10 +245,17 @@ export class XChaCha20Poly1305 {
     // Generate a random private key.
     // See https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues#usage_notes for
     // an explanation for why Web Crypto generateKey() is used instead of getRandomValues().
-    const webCryptoKey = await webCrypto.generateKey( { name: 'AES-CTR', length: 256 }, true, ['encrypt']);
+    const webCryptoKey = await webCrypto.generateKey(
+      { name: "AES-CTR", length: 256 },
+      true,
+      ["encrypt"]
+    );
 
     // Export the private key in JWK format.
-    const { alg, ext, key_ops, ...privateKey } = await webCrypto.exportKey('jwk', webCryptoKey);
+    const { alg, ext, key_ops, ...privateKey } = await webCrypto.exportKey(
+      "jwk",
+      webCryptoKey
+    );
 
     // Compute the JWK thumbprint and set as the key ID.
     privateKey.kid = await computeJwkThumbprint({ jwk: privateKey });
@@ -258,12 +281,16 @@ export class XChaCha20Poly1305 {
    *
    * @returns A Promise that resolves to the symmetric key as a Uint8Array.
    */
-  public static async privateKeyToBytes({ privateKey }: {
+  public static async privateKeyToBytes({
+    privateKey,
+  }: {
     privateKey: Jwk;
   }): Promise<Uint8Array> {
     // Verify the provided JWK represents a valid oct private key.
     if (!isOctPrivateJwk(privateKey)) {
-      throw new Error(`XChaCha20Poly1305: The provided key is not a valid oct private key.`);
+      throw new Error(
+        `XChaCha20Poly1305: The provided key is not a valid oct private key.`
+      );
     }
 
     // Decode the provided private key to bytes.

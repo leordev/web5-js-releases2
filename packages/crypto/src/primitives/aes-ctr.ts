@@ -1,9 +1,9 @@
-import { Convert } from '@web5/common';
-import { getWebcryptoSubtle } from '@noble/ciphers/webcrypto/utils';
+import { Convert } from "@leordev-web5/common";
+import { getWebcryptoSubtle } from "@noble/ciphers/webcrypto/utils";
 
-import type { Jwk } from '../jose/jwk.js';
+import type { Jwk } from "../jose/jwk.js";
 
-import { computeJwkThumbprint, isOctPrivateJwk } from '../jose/jwk.js';
+import { computeJwkThumbprint, isOctPrivateJwk } from "../jose/jwk.js";
 
 /**
  * Constant defining the AES block size in bits.
@@ -121,13 +121,15 @@ export class AesCtr {
    *
    * @returns A Promise that resolves to the symmetric key in JWK format.
    */
-  public static async bytesToPrivateKey({ privateKeyBytes }: {
+  public static async bytesToPrivateKey({
+    privateKeyBytes,
+  }: {
     privateKeyBytes: Uint8Array;
   }): Promise<Jwk> {
     // Construct the private key in JWK format.
     const privateKey: Jwk = {
-      k   : Convert.uint8Array(privateKeyBytes).toBase64Url(),
-      kty : 'oct'
+      k: Convert.uint8Array(privateKeyBytes).toBase64Url(),
+      kty: "oct",
     };
 
     // Compute the JWK thumbprint and set as the key ID.
@@ -166,7 +168,12 @@ export class AesCtr {
    *
    * @returns A Promise that resolves to the decrypted data as a Uint8Array.
    */
-  public static async decrypt({ key, data, counter, length }: {
+  public static async decrypt({
+    key,
+    data,
+    counter,
+    length,
+  }: {
     key: Jwk;
     data: Uint8Array;
     counter: Uint8Array;
@@ -174,23 +181,33 @@ export class AesCtr {
   }): Promise<Uint8Array> {
     // Validate the initial counter block length matches the AES block size.
     if (counter.byteLength !== AES_BLOCK_SIZE / 8) {
-      throw new TypeError(`The counter must be ${AES_BLOCK_SIZE} bits in length`);
+      throw new TypeError(
+        `The counter must be ${AES_BLOCK_SIZE} bits in length`
+      );
     }
 
     // Validate the length of the counter.
     if (length === 0 || length > COUNTER_MAX_LENGTH) {
-      throw new TypeError(`The 'length' property must be in the range 1 to ${COUNTER_MAX_LENGTH}`);
+      throw new TypeError(
+        `The 'length' property must be in the range 1 to ${COUNTER_MAX_LENGTH}`
+      );
     }
 
     // Get the Web Crypto API interface.
     const webCrypto = getWebcryptoSubtle();
 
     // Import the JWK into the Web Crypto API to use for the decrypt operation.
-    const webCryptoKey = await webCrypto.importKey('jwk', key, { name: 'AES-CTR' }, true, ['decrypt']);
+    const webCryptoKey = await webCrypto.importKey(
+      "jwk",
+      key,
+      { name: "AES-CTR" },
+      true,
+      ["decrypt"]
+    );
 
     // Decrypt the data.
     const plaintextBuffer = await webCrypto.decrypt(
-      { name: 'AES-CTR', counter, length },
+      { name: "AES-CTR", counter, length },
       webCryptoKey,
       data
     );
@@ -231,7 +248,12 @@ export class AesCtr {
    *
    * @returns A Promise that resolves to the encrypted data as a Uint8Array.
    */
-  public static async encrypt({ key, data, counter, length }: {
+  public static async encrypt({
+    key,
+    data,
+    counter,
+    length,
+  }: {
     key: Jwk;
     data: Uint8Array;
     counter: Uint8Array;
@@ -239,23 +261,33 @@ export class AesCtr {
   }): Promise<Uint8Array> {
     // Validate the initial counter block value length.
     if (counter.byteLength !== AES_BLOCK_SIZE / 8) {
-      throw new TypeError(`The counter must be ${AES_BLOCK_SIZE} bits in length`);
+      throw new TypeError(
+        `The counter must be ${AES_BLOCK_SIZE} bits in length`
+      );
     }
 
     // Validate the length of the counter.
     if (length === 0 || length > COUNTER_MAX_LENGTH) {
-      throw new TypeError(`The 'length' property must be in the range 1 to ${COUNTER_MAX_LENGTH}`);
+      throw new TypeError(
+        `The 'length' property must be in the range 1 to ${COUNTER_MAX_LENGTH}`
+      );
     }
 
     // Get the Web Crypto API interface.
     const webCrypto = getWebcryptoSubtle();
 
     // Import the JWK into the Web Crypto API to use for the encrypt operation.
-    const webCryptoKey = await webCrypto.importKey('jwk', key, { name: 'AES-CTR' }, true, ['encrypt', 'decrypt']);
+    const webCryptoKey = await webCrypto.importKey(
+      "jwk",
+      key,
+      { name: "AES-CTR" },
+      true,
+      ["encrypt", "decrypt"]
+    );
 
     // Encrypt the data.
     const ciphertextBuffer = await webCrypto.encrypt(
-      { name: 'AES-CTR', counter, length },
+      { name: "AES-CTR", counter, length },
       webCryptoKey,
       data
     );
@@ -292,12 +324,16 @@ export class AesCtr {
    *
    * @returns A Promise that resolves to the generated symmetric key in JWK format.
    */
-  public static async generateKey({ length }: {
-    length: typeof AES_KEY_LENGTHS[number];
+  public static async generateKey({
+    length,
+  }: {
+    length: (typeof AES_KEY_LENGTHS)[number];
   }): Promise<Jwk> {
     // Validate the key length.
     if (!AES_KEY_LENGTHS.includes(length as any)) {
-      throw new RangeError(`The key length is invalid: Must be ${AES_KEY_LENGTHS.join(', ')} bits`);
+      throw new RangeError(
+        `The key length is invalid: Must be ${AES_KEY_LENGTHS.join(", ")} bits`
+      );
     }
 
     // Get the Web Crypto API interface.
@@ -306,10 +342,17 @@ export class AesCtr {
     // Generate a random private key.
     // See https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues#usage_notes for
     // an explanation for why Web Crypto generateKey() is used instead of getRandomValues().
-    const webCryptoKey = await webCrypto.generateKey( { name: 'AES-CTR', length }, true, ['encrypt']);
+    const webCryptoKey = await webCrypto.generateKey(
+      { name: "AES-CTR", length },
+      true,
+      ["encrypt"]
+    );
 
     // Export the private key in JWK format.
-    const { ext, key_ops, ...privateKey } = await webCrypto.exportKey('jwk', webCryptoKey);
+    const { ext, key_ops, ...privateKey } = await webCrypto.exportKey(
+      "jwk",
+      webCryptoKey
+    );
 
     // Compute the JWK thumbprint and set as the key ID.
     privateKey.kid = await computeJwkThumbprint({ jwk: privateKey });
@@ -336,12 +379,16 @@ export class AesCtr {
    *
    * @returns A Promise that resolves to the symmetric key as a Uint8Array.
    */
-  public static async privateKeyToBytes({ privateKey }: {
+  public static async privateKeyToBytes({
+    privateKey,
+  }: {
     privateKey: Jwk;
   }): Promise<Uint8Array> {
     // Verify the provided JWK represents a valid oct private key.
     if (!isOctPrivateJwk(privateKey)) {
-      throw new Error(`AesCtr: The provided key is not a valid oct private key.`);
+      throw new Error(
+        `AesCtr: The provided key is not a valid oct private key.`
+      );
     }
 
     // Decode the provided private key to bytes.
