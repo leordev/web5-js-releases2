@@ -63,6 +63,7 @@ jobs:
         id: check_api_release
         run: scripts/changesets-api-release-check.sh
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           KICK_API_RELEASE: ${{ github.event.inputs.kick_api_release || '' }}
 
       - name: Create Release Pull Request or Publish to npm
