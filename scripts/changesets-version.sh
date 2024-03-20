@@ -19,5 +19,5 @@ fi
 
 pnpm changeset version $IGNORE_API_RELEASE
 
-# update package-lock.json
-pnpm i
+# update pnpm-lock.yaml
+pnpm install
