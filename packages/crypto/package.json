@@ -1,6 +1,6 @@
 {
   "name": "@leordev-web5/crypto",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Web5 cryptographic library",
   "type": "module",
   "main": "./dist/cjs/index.js",

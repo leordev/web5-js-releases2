@@ -1,6 +1,6 @@
 {
   "name": "@leordev-web5/crypto-aws-kms",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Web5 cryptographic library using AWS KMS",
   "type": "module",
   "main": "./dist/cjs/index.js",
@@ -71,7 +71,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-kms": "3.478.0",
-    "@leordev-web5/crypto": "workspace:0.4.0"
+    "@leordev-web5/crypto": "workspace:0.4.1"
   },
   "devDependencies": {
     "@playwright/test": "1.40.1",
