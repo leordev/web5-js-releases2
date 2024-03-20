@@ -431,7 +431,7 @@ importers:
     dependencies:
       '@leordev-web5/common':
         specifier: 0.2.4
-        version: link:../common
+        version: 0.2.4
       '@noble/ciphers':
         specifier: 0.4.1
         version: 0.4.1
@@ -523,9 +523,9 @@ importers:
       '@aws-sdk/client-kms':
         specifier: 3.478.0
         version: 3.478.0
-      '@web5/crypto':
-        specifier: 0.4.0
-        version: 0.4.0
+      '@leordev-web5/crypto':
+        specifier: workspace:0.4.0
+        version: link:../crypto
     devDependencies:
       '@playwright/test':
         specifier: 1.40.1
@@ -2042,6 +2042,16 @@ packages:
 
   /@leichtgewicht/ip-codec@2.0.4:
     resolution: {integrity: sha512-Hcv+nVC0kZnQ3tD9GVu5xSMR4VVYOteQIr/hwFPVEvPdlXqgGEuRjiheChHgdM+JyqdgNcmzZOX/tnl0JOiI7A==}
+
+  /@leordev-web5/common@0.2.4:
+    resolution: {integrity: sha512-bte90QSj/BTyZvRGk6TaRW5gQOHsSd0P7eI1pjXLjCgkEkDdk+7asG+T+7dAjI/YVhSrBbUkH77rCD9I89ATag==}
+    engines: {node: '>=20.9.0'}
+    dependencies:
+      '@isaacs/ttlcache': 1.4.1
+      level: 8.0.0
+      multiformats: 11.0.2
+      readable-stream: 4.4.2
+    dev: false
 
   /@manypkg/find-root@1.1.0:
     resolution: {integrity: sha512-mki5uBvhHzO8kYYix/WRy2WX8S3B5wdVSc9D6KcU5lQNglP2yt58/VfLuAK49glRXChosY8ap2oJ1qgma3GUVA==}
@@ -8912,7 +8922,7 @@ packages:
     dependencies:
       iconv-lite: 0.6.3
       source-map-js: 1.0.2
-      webpack: 5.90.3(esbuild@0.19.8)
+      webpack: 5.90.3
     dev: true
 
   /source-map-support@0.5.21:
@@ -9224,7 +9234,7 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
-  /terser-webpack-plugin@5.3.10(esbuild@0.19.8)(webpack@5.90.3):
+  /terser-webpack-plugin@5.3.10(webpack@5.90.3):
     resolution: {integrity: sha512-BKFPWlPDndPs+NGGCr1U59t0XScL5317Y0UReNrHaw9/FwhPENlq6bfgs+4yPfyP51vqC1bQ4rp1EfXW5ZSH9w==}
     engines: {node: '>= 10.13.0'}
     peerDependencies:
@@ -9241,12 +9251,11 @@ packages:
         optional: true
     dependencies:
       '@jridgewell/trace-mapping': 0.3.22
-      esbuild: 0.19.8
       jest-worker: 27.5.1
       schema-utils: 3.3.0
       serialize-javascript: 6.0.2
       terser: 5.27.2
-      webpack: 5.90.3(esbuild@0.19.8)
+      webpack: 5.90.3
     dev: true
 
   /terser@5.27.2:
@@ -9674,7 +9683,7 @@ packages:
     engines: {node: '>=10.13.0'}
     dev: true
 
-  /webpack@5.90.3(esbuild@0.19.8):
+  /webpack@5.90.3:
     resolution: {integrity: sha512-h6uDYlWCctQRuXBs1oYpVe6sFcWedl0dpcVaTf/YF67J9bKvwJajFulMVSYKHrksMB3I/pIagRzDxwxkebuzKA==}
     engines: {node: '>=10.13.0'}
     hasBin: true
@@ -9705,7 +9714,7 @@ packages:
       neo-async: 2.6.2
       schema-utils: 3.3.0
       tapable: 2.2.1
-      terser-webpack-plugin: 5.3.10(esbuild@0.19.8)(webpack@5.90.3)
+      terser-webpack-plugin: 5.3.10(webpack@5.90.3)
       watchpack: 2.4.0
       webpack-sources: 3.2.3
     transitivePeerDependencies:

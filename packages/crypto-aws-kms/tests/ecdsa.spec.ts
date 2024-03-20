@@ -1,4 +1,4 @@
-import type { Jwk } from '@web5/crypto';
+import type { Jwk } from '@leordev-web5/crypto';
 
 import sinon from 'sinon';
 import { expect } from 'chai';

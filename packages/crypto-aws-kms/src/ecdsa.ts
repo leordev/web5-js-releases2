@@ -6,9 +6,9 @@ import type {
   KmsSignParams,
   KmsVerifyParams,
   KmsGenerateKeyParams,
-} from '@web5/crypto';
+} from '@leordev-web5/crypto';
 
-import { isEcPublicJwk, Secp256k1 } from '@web5/crypto';
+import { isEcPublicJwk, Secp256k1 } from '@leordev-web5/crypto';
 import {
   KeySpec,
   KMSClient,
@@ -163,7 +163,7 @@ export class EcdsaAlgorithm implements
    * Note: The signature returned is normalized to low-S to prevent signature malleability. This
    * ensures that the signature can be verified by other libraries that enforce strict verification.
    * More information on signature malleability can be found
-   * {@link @web5/crypto#Secp256k1.adjustSignatureToLowS | here}.
+   * {@link @leordev-web5/crypto#Secp256k1.adjustSignatureToLowS | here}.
    *
    * @example
    * ```ts

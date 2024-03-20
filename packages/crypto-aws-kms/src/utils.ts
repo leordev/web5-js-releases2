@@ -1,4 +1,4 @@
-import type { Jwk, KeyIdentifier } from '@web5/crypto';
+import type { Jwk, KeyIdentifier } from '@leordev-web5/crypto';
 
 import { createPublicKey } from 'node:crypto';
 import { CreateAliasCommand, DescribeKeyCommand, KMSClient, KeySpec } from '@aws-sdk/client-kms';

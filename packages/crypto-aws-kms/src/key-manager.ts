@@ -8,9 +8,9 @@ import type {
   KmsGetKeyUriParams,
   KmsGenerateKeyParams,
   KmsGetPublicKeyParams,
-} from '@web5/crypto';
+} from '@leordev-web5/crypto';
 
-import { computeJwkThumbprint, KEY_URI_PREFIX_JWK, Sha2Algorithm } from '@web5/crypto';
+import { computeJwkThumbprint, KEY_URI_PREFIX_JWK, Sha2Algorithm } from '@leordev-web5/crypto';
 import {
   KeySpec,
   KMSClient,
