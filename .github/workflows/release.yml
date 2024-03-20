@@ -7,6 +7,12 @@ on:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+    inputs:
+      kick_api_release:
+        description: "Kick API release"
+        required: false
+        default: false
+        type: boolean
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
@@ -59,11 +65,23 @@ jobs:
         with:
           # publish: scripts/changesets-publish.sh # pnpm changeset publish
           publish: pnpm changeset publish
-          version: scripts/changesets-version.sh
+          version: scripts/changesets-version.sh ${{ github.event.inputs.kick_api_release || '' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Label Changesets PR with API release
+        if: github.event.inputs.kick_api_release && steps.changesets.outputs.pullRequestNumber != ''
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        with:
+          script: |
+            github.rest.issues.addLabels({
+              issue_number: ${{ steps.changesets.outputs.pullRequestNumber }},
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['api-release']
+            })
 
       - name: Publish `next` preview
         if: steps.changesets.outputs.published != 'true' && steps.changesets.outputs.pullRequestNumber != '' && steps.changesets.outputs.hasChangesets == 'true'

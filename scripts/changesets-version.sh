@@ -2,8 +2,12 @@
 
 IGNORE_API_RELEASE=""
 
-# check if there is a changeset PR with the api-release label
-API_RELEASE_PR=$(gh pr list \
+# force api release if argument is passed
+FORCE_API_RELEASE=$1
+
+# check if api release is forced or if there 
+# is a changeset PR with the api-release label
+API_RELEASE_PR=$FORCE_API_RELEASE || $(gh pr list \
                 --base 'main' \
                 --head 'changeset-release/main' \
                 --json title,labels,number \
