@@ -15,7 +15,7 @@ on:
         type: boolean
 
   # Triggered when a PR is labeled/unlabeled with `api-release`
-  pull_request:
+  pull_request_target:
     types: [labeled, unlabeled]
     branches:
       - main
@@ -28,7 +28,7 @@ jobs:
     # if: github.repository == 'TBD54566975/web5-js'
 
     # if its a pr label event check if the head ref is a release branch
-    if: github.event_name != 'pull_request' || (contains(github.event.action, 'labeled') && startsWith(github.event.pull_request.head.ref, 'changeset'))
+    if: github.event_name != 'pull_request_target' || (contains(github.event.action, 'labeled') && startsWith(github.event.pull_request.head.ref, 'changeset'))
 
     permissions:
       contents: write # to create release (changesets/action)
