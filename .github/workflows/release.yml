@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
     inputs:
       kick_api_release:
-        description: "Kick API release"
+        description: "Kick @web5/api release"
         required: false
         default: false
         type: boolean
@@ -59,7 +59,7 @@ jobs:
       - name: Build all workspace packages
         run: pnpm --recursive --stream build:esm && pnpm --recursive --stream build:cjs
 
-      - name: Check API Release Flow
+      - name: Check @web5/api Release Flow
         id: check_api_release
         run: scripts/changesets-api-release-check.sh
         env:
