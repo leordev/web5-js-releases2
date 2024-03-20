@@ -59,13 +59,20 @@ jobs:
       - name: Build all workspace packages
         run: pnpm --recursive --stream build:esm && pnpm --recursive --stream build:cjs
 
+      - name: Check API Release Flow
+        id: check_api_release
+        run: scripts/changesets-api-release-check.sh
+        env:
+          KICK_API_RELEASE: ${{ github.event.inputs.kick_api_release || '' }}
+
       - name: Create Release Pull Request or Publish to npm
         uses: changesets/action@aba318e9165b45b7948c60273e0b72fce0a64eb9 # v1.4.7
         id: changesets
+        if: steps.check_api_release.outputs.skip_release != 'true'
         with:
           # publish: scripts/changesets-publish.sh # pnpm changeset publish
           publish: pnpm changeset publish
-          version: scripts/changesets-version.sh ${{ github.event.inputs.kick_api_release || '' }}
+          version: scripts/changesets-version.sh ${{ steps.check_api_release.outputs.release_web5_api || '' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
