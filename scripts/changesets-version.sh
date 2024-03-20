@@ -20,4 +20,4 @@ fi
 pnpm changeset version $IGNORE_API_RELEASE
 
 # update package-lock.json
-pnpm i --package-lock-only
+pnpm i
