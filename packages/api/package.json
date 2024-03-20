@@ -1,5 +1,5 @@
 {
-  "name": "@web5/api",
+  "name": "@leordev-web5/api",
   "version": "0.8.4",
   "description": "SDK for accessing the features and capabilities of Web5",
   "type": "module",

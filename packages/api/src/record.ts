@@ -391,7 +391,7 @@ export class Record implements RecordModel {
         author      : this._connectedDid,
         target      : target,
         rawMessage
-      };
+      } as any;
       await this._agent.sendDwnRequest(initialState);
 
       // Set the cache to maintain awareness that we don't need to send the initial write next time.
@@ -399,7 +399,7 @@ export class Record implements RecordModel {
     }
 
     // Prepare the current state for sending to the target
-    const latestState: SendDwnRequest = {
+    const latestState: any = {
       messageType : DwnInterfaceName.Records + DwnMethodName.Write,
       author      : this._connectedDid,
       dataStream  : await this.data.blob(),
@@ -557,7 +557,7 @@ export class Record implements RecordModel {
         target      : this._connectedDid,
         signAsOwner,
         store,
-      };
+      } as any;
 
       // Process the prepared initial write, with the options set for storing and/or signing as the owner.
       const agentResponse = await this._agent.processDwnRequest(initialWriteRequest);
@@ -584,7 +584,7 @@ export class Record implements RecordModel {
       dataStream  : await this.data.blob(),
       signAsOwner,
       store,
-    };
+    } as any;
 
     const agentResponse = await this._agent.processDwnRequest(requestOptions);
     const { message, reply: { status } } = agentResponse;

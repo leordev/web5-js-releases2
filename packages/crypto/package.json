@@ -1,5 +1,5 @@
 {
-  "name": "@web5/crypto",
+  "name": "@leordev-web5/crypto",
   "version": "0.4.0",
   "description": "Web5 cryptographic library",
   "type": "module",
