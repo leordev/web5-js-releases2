@@ -19,12 +19,12 @@ on:
     branches: ["main"]
 
 # Declare default permissions as read only.
-permissions: write-all
+permissions: read-all
 
 jobs:
   ossf:
+    permissions:
+      security-events: write
+      id-token: write
     uses: TBD54566975/open-source-programs/.github/workflows/scorecard.yml@leordev/ossf
     secrets: inherit
-    # permissions:
-    #   security-events: write
-    #   id-token: write
