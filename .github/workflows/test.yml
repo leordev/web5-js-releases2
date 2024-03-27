@@ -15,8 +15,6 @@ on:
 
   workflow_dispatch:
 
-permissions: read-all
-
 jobs:
   security-license-scan:
     uses: TBD54566975/open-source-programs/.github/workflows/security.yml@leordev/fossa-fix
