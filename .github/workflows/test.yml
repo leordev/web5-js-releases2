@@ -16,33 +16,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  fossa-scan:
-    name: Testing GH Stuff
-    runs-on: ubuntu-latest
-    outputs:
-      fossaScanResults: ${{ steps.fossa_test.outputs.results }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref }}
-
-      - name: Testing stuff
-        run: |
-          DIFF_OPTION=""
-          MAIN_BRANCH="main"
-          MAIN_BRANCH_REF="refs/heads/$MAIN_BRANCH"
-
-          CURRENT_BRANCH_REF="${{ github.head_ref || github.ref }}"
-          echo "Current Branch: $CURRENT_BRANCH_REF"
-          echo "Main Branch: $MAIN_BRANCH_REF"
-
-          if [ "$CURRENT_BRANCH_REF" != "$MAIN_BRANCH_REF" ]; then
-            git fetch origin $MAIN_BRANCH
-            MAIN_SHA=$(git rev-parse origin/$MAIN_BRANCH)
-            DIFF_OPTION="--diff $MAIN_SHA"
-          fi
-
-          CMD="fossa test --format json $DIFF_OPTION"
-          echo "Running FOSSA Test with command: '$CMD'"
+  security-license-scan:
+    uses: TBD54566975/open-source-programs/.github/workflows/security.yml@leordev/fossa-fix
+    secrets: inherit
