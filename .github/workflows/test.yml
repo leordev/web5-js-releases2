@@ -45,4 +45,4 @@ jobs:
           fi
 
           CMD="fossa test --format json $DIFF_OPTION"
-          echo "Running FOSSA Test with command: `$CMD`"
+          echo "Running FOSSA Test with command: '$CMD'"
