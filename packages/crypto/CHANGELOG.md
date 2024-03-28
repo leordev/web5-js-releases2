@@ -1,5 +1,11 @@
 # @leordev-web5/crypto
 
+## 0.4.2
+
+### Patch Changes
+
+- [`d93dfc4`](https://github.com/leordev/web5-js-releases2/commit/d93dfc4c237482872b7ef8ccb1de9ea1f41378ff) Thanks [@leordev](https://github.com/leordev)! - super patch on crypto
+
 ## 0.4.1
 
 ### Patch Changes

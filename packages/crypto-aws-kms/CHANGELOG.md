@@ -1,5 +1,12 @@
 # @leordev-web5/crypto-aws-kms
 
+## 0.2.2
+
+### Patch Changes
+
+- Updated dependencies [[`d93dfc4`](https://github.com/leordev/web5-js-releases2/commit/d93dfc4c237482872b7ef8ccb1de9ea1f41378ff)]:
+  - @leordev-web5/crypto@0.4.2
+
 ## 0.2.1
 
 ### Patch Changes
