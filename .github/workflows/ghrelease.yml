@@ -1,0 +1,30 @@
+name: Release
+
+on:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 #v4.1.1
+        with:
+          ref: main
+
+      # https://cashapp.github.io/hermit/usage/ci/
+      - name: Init Hermit
+        uses: cashapp/activate-hermit@31ce88b17a84941bb1b782f1b7b317856addf286 # v1.1.0
+        with:
+          cache: "true"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ github.event.inputs.version }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
